@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My AI Studio</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #101827;
+  color: white;
+  text-align: center;
+  padding: 20px;
+}
+.container {
+  max-width: 500px;
+  margin: auto;
+  background: #1e293b;
+  padding: 20px;
+  border-radius: 15px;
+}
+textarea, input, button {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  box-sizing: border-box;
+  border-radius: 8px;
+}
+textarea {
+  height: 130px;
+}
+button {
+  background: #7c3aed;
+  color: white;
+  border: none;
+  font-size: 17px;
+}
+#result {
+  white-space: pre-wrap;
+  line-height: 1.7;
+}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>🎬 My AI Studio</h1>
+<p>اپنی کہانی لکھیں اور ویڈیو بنانے کا سفر شروع کریں۔</p>
+
+<textarea id="story" placeholder="یہاں اپنی کہانی لکھیں..."></textarea>
+
+<label>اپنی تصویر منتخب کریں:</label>
+<input type="file" id="image" accept="image/*">
+
+<button onclick="prepareVideo()">کہانی تیار کریں</button>
+
+<div id="result"></div>
+</div>
+
+<script>
+function prepareVideo() {
+  const story = document.getElementById("story").value.trim();
+  const result = document.getElementById("result");
+
+  if (!story) {
+    result.textContent = "براہ کرم پہلے اپنی کہانی لکھیں۔";
+    return;
+  }
+
+  result.textContent =
+    "آپ کی کہانی موصول ہوگئی!\n\n" +
+    story +
+    "\n\nاگلا مرحلہ: AI ویڈیو سروس سے رابطہ قائم کرنا۔";
+}
+</script>
+</body>
+</html>
