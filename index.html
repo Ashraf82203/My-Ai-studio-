@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ur">
 <head>
@@ -5,71 +6,172 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>My AI Studio</title>
 <style>
+* { box-sizing: border-box; }
 body {
+  margin: 0;
+  padding: 20px;
   font-family: Arial, sans-serif;
   background: #101827;
   color: white;
   text-align: center;
-  padding: 20px;
 }
 .container {
-  max-width: 500px;
+  max-width: 600px;
   margin: auto;
-  background: #1e293b;
-  padding: 20px;
-  border-radius: 15px;
+  background: #1d293b;
+  padding: 22px;
+  border-radius: 16px;
 }
-textarea, input, button {
+h1 { color: #69e4ff; }
+p { line-height: 1.7; }
+label {
+  display: block;
+  text-align: right;
+  margin: 16px 0 7px;
+}
+textarea, select, input[type="text"] {
   width: 100%;
   padding: 12px;
-  margin: 10px 0;
-  box-sizing: border-box;
+  border-radius: 8px;
+  border: 1px solid #52627a;
+  background: #101827;
+  color: white;
+  font-size: 16px;
+}
+textarea { min-height: 120px; resize: vertical; }
+input[type="file"] {
+  width: 100%;
+  padding: 10px;
+  background: #101827;
   border-radius: 8px;
 }
-textarea {
-  height: 130px;
-}
 button {
-  background: #7c3aed;
-  color: white;
-  border: none;
-  font-size: 17px;
+  width: 100%;
+  padding: 13px;
+  margin-top: 12px;
+  border: 0;
+  border-radius: 8px;
+  background: #06b6d4;
+  color: #071522;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
 }
-#result {
+.secondary { background: #34445c; color: white; }
+#preview {
+  max-width: 100%;
+  max-height: 280px;
+  margin-top: 15px;
+  border-radius: 10px;
+  display: none;
+}
+#status {
   white-space: pre-wrap;
-  line-height: 1.7;
+  overflow-wrap: anywhere;
+  margin-top: 18px;
+  color: #b9f5ff;
 }
+.small { color: #cbd5e1; font-size: 14px; }
 </style>
 </head>
 <body>
 <div class="container">
-<h1>🎬 My AI Studio</h1>
-<p>اپنی کہانی لکھیں اور ویڈیو بنانے کا سفر شروع کریں۔</p>
+  <h1>🎬 My AI Studio</h1>
+  <p>اپنی کہانی لکھیں، تصویر منتخب کریں اور آواز کی زبان چنیں۔</p>
 
-<textarea id="story" placeholder="یہاں اپنی کہانی لکھیں..."></textarea>
+  <label for="story">اپنی کہانی لکھیں:</label>
+  <textarea id="story" placeholder="یہاں اپنی ویڈیو کی کہانی لکھیں..."></textarea>
 
-<label>اپنی تصویر منتخب کریں:</label>
-<input type="file" id="image" accept="image/*">
+  <label for="photo">اپنی تصویر منتخب کریں:</label>
+  <input type="file" id="photo" accept="image/*">
+  <img id="preview" alt="آپ کی منتخب کردہ تصویر">
 
-<button onclick="prepareVideo()">کہانی تیار کریں</button>
+  <label for="language">آواز کی زبان منتخب کریں:</label>
+  <select id="language">
+    <option value="ur-PK">اردو</option>
+    <option value="en-US">English</option>
+    <option value="hi-IN">हिन्दी</option>
+    <option value="ar-SA">العربية</option>
+    <option value="pa-IN">پنجابی</option>
+    <option value="bn-BD">بنگالی</option>
+    <option value="tr-TR">ترکی</option>
+    <option value="fr-FR">فرانسیسی</option>
+    <option value="es-ES">ہسپانوی</option>
+    <option value="zh-CN">چینی</option>
+  </select>
 
-<div id="result"></div>
+  <button onclick="speakStory()">🔊 کہانی کی آواز سنیں</button>
+  <button class="secondary" onclick="stopVoice()">⏹ آواز بند کریں</button>
+  <button onclick="makeVideo()">🎥 AI ویڈیو بنائیں</button>
+
+  <div id="status" role="status">آپ کی کہانی اور تصویر تیار ہونے کے منتظر ہیں۔</div>
+  <p class="small">
+    نوٹ: آواز آپ کے براؤزر میں دستیاب زبانوں پر منحصر ہے۔
+    اصل AI ویڈیو بنانے کی سروس ابھی منسلک نہیں ہے۔
+  </p>
 </div>
 
 <script>
-function prepareVideo() {
-  const story = document.getElementById("story").value.trim();
-  const result = document.getElementById("result");
+const photo = document.getElementById("photo");
+const preview = document.getElementById("preview");
+const story = document.getElementById("story");
+const statusBox = document.getElementById("status");
 
-  if (!story) {
-    result.textContent = "براہ کرم پہلے اپنی کہانی لکھیں۔";
+photo.addEventListener("change", function () {
+  const file = this.files[0];
+  if (!file) {
+    preview.style.display = "none";
+    return;
+  }
+  if (!file.type.startsWith("image/")) {
+    statusBox.textContent = "براہ کرم تصویر والی فائل منتخب کریں۔";
+    this.value = "";
+    return;
+  }
+  preview.src = URL.createObjectURL(file);
+  preview.style.display = "block";
+  statusBox.textContent = "تصویر منتخب ہوگئی۔";
+});
+
+function speakStory() {
+  const text = story.value.trim();
+  if (!text) {
+    statusBox.textContent = "پہلے اپنی کہانی لکھیں۔";
+    return;
+  }
+  if (!("speechSynthesis" in window)) {
+    statusBox.textContent =
+      "آپ کا براؤزر آواز سنانے کی سہولت فراہم نہیں کرتا۔";
     return;
   }
 
-  result.textContent =
-    "آپ کی کہانی موصول ہوگئی!\n\n" +
-    story +
-    "\n\nاگلا مرحلہ: AI ویڈیو سروس سے رابطہ قائم کرنا۔";
+  window.speechSynthesis.cancel();
+  const speech = new SpeechSynthesisUtterance(text);
+  speech.lang = document.getElementById("language").value;
+  speech.rate = 0.9;
+  window.speechSynthesis.speak(speech);
+  statusBox.textContent =
+    "کہانی کی آواز چلانے کی درخواست بھیج دی گئی ہے۔";
+}
+
+function stopVoice() {
+  if ("speechSynthesis" in window) {
+    window.speechSynthesis.cancel();
+  }
+  statusBox.textContent = "آواز روک دی گئی ہے۔";
+}
+
+function makeVideo() {
+  if (!story.value.trim()) {
+    statusBox.textContent = "پہلے اپنی کہانی لکھیں۔";
+    return;
+  }
+  if (!photo.files.length) {
+    statusBox.textContent = "پہلے اپنی تصویر منتخب کریں۔";
+    return;
+  }
+  statusBox.textContent =
+    "آپ کی کہانی اور تصویر تیار ہیں، لیکن اصل AI ویڈیو بنانے کی سروس ابھی منسلک نہیں ہے۔ اگلے مرحلے میں ہمیں AI ویڈیو سروس جوڑنی ہوگی۔";
 }
 </script>
 </body>
