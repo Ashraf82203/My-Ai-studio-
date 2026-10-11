@@ -6,67 +6,222 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>My AI Video Generator</title>
 <style>
-body{font-family:Arial,sans-serif;background:#101827;color:white;padding:18px;margin:0}
-main{max-width:650px;margin:auto}
-h1{color:#61f2bd;text-align:center}
+*{box-sizing:border-box}
+body{margin:0;padding:16px;background:#101827;color:#fff;font-family:Arial,sans-serif}
+main{max-width:700px;margin:auto}
+h1{text-align:center;color:#61f2bd}
 .panel{background:#1d2a40;padding:18px;border-radius:14px;margin:16px 0}
-textarea{width:100%;box-sizing:border-box;min-height:140px;padding:12px;font-size:16px;border-radius:8px}
-button{width:100%;padding:14px;margin-top:12px;background:#61f2bd;border:0;border-radius:8px;font-size:17px;font-weight:bold}
-button:disabled{opacity:.6}
+label{display:block;margin:14px 0 7px;font-weight:bold}
+textarea,select,input[type=file]{width:100%;padding:12px;border-radius:8px;border:1px solid #52637c;background:#111c2e;color:white;font-size:16px}
+textarea{min-height:110px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+button{width:100%;padding:14px;margin-top:14px;border:0;border-radius:9px;background:#61f2bd;color:#102033;font-weight:bold;font-size:16px}
+button:disabled{opacity:.5}
+.note{color:#c4d0e2;line-height:1.6;font-size:14px}
 #status{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6}
-.note{color:#c4d0e2;line-height:1.6}
+video{width:100%;margin-top:12px;border-radius:10px;background:#000}
+a{color:#61f2bd;overflow-wrap:anywhere}
+.hidden{display:none}
+@media(max-width:450px){.grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <main>
 <h1>🎬 AI Video Generator</h1>
+
 <section class="panel">
-<h3>اپنی ویڈیو کی کہانی لکھیں</h3>
-<textarea id="prompt">A small colorful bird flying through a beautiful garden at sunrise, cinematic camera movement, realistic animation.</textarea>
-<p class="note">یہ ٹیسٹ Magic Hour کو پرامپٹ بھیجے گا۔ ویڈیو بننے میں وقت لگ سکتا ہے۔</p>
-<button id="make">🎬 AI ویڈیو بنائیں</button>
-<p id="status">ویڈیو بنانے کے لیے بٹن دبائیں۔</p>
+<label for="mode">ویڈیو بنانے کا طریقہ</label>
+<select id="mode">
+  <option value="text">ٹیکسٹ سے ویڈیو</option>
+  <option value="image">تصویر سے ویڈیو</option>
+</select>
+
+<div id="imageBox" class="hidden">
+  <label for="image">اپنی تصویر منتخب کریں (PNG/JPG/WebP، زیادہ سے زیادہ 10 MB)</label>
+  <input id="image" type="file" accept="image/png,image/jpeg,image/webp">
+</div>
+
+<label for="prompt">ویڈیو کی کہانی یا پرامپٹ</label>
+<textarea id="prompt" placeholder="یہاں اپنی ویڈیو کی تفصیل لکھیں">A colorful bird flying through a beautiful garden at sunrise, cinematic camera movement.</textarea>
+
+<label for="voiceover">وائس اوور کا متن (اختیاری)</label>
+<textarea id="voiceover" placeholder="وہ الفاظ لکھیں جو ویڈیو میں بولے جانے چاہییں"></textarea>
+<p class="note">نوٹ: متن کو آواز کی ہدایت کے طور پر بھیجا جائے گا۔ یہ نظام فی الحال اس بات کی ضمانت نہیں دیتا کہ ہر لفظ بعینہٖ بولا جائے گا۔</p>
+
+<div class="grid">
+  <div>
+    <label for="language">زبان</label>
+    <select id="language">
+      <option>Urdu</option>
+      <option>English</option>
+      <option>Arabic</option>
+      <option>Hindi</option>
+      <option>Punjabi</option>
+      <option>Other</option>
+    </select>
+  </div>
+  <div>
+    <label for="ratio">ویڈیو کا سائز</label>
+    <select id="ratio">
+      <option value="16:9">16:9 — YouTube</option>
+      <option value="9:16">9:16 — Shorts/Reels</option>
+    </select>
+  </div>
+  <div>
+    <label for="duration">دورانیہ</label>
+    <select id="duration">
+      <option value="15">15 سیکنڈ</option>
+      <option value="30">30 سیکنڈ</option>
+      <option value="60">1 منٹ</option>
+      <option value="180" disabled>3 منٹ — بعد میں دستیاب</option>
+      <option value="300" disabled>5 منٹ — بعد میں دستیاب</option>
+    </select>
+  </div>
+  <div>
+    <label for="resolution">ریزولوشن</label>
+    <select id="resolution">
+      <option value="720p">720p HD</option>
+      <option value="1080p">1080p Full HD</option>
+    </select>
+  </div>
+</div>
+
+<p class="note">1080p اس ورژن میں 15 سیکنڈ تک کی ویڈیو کے لیے منتخب کیا جا سکتا ہے۔ دستیابی آپ کے Magic Hour پلان اور منتخب ماڈل پر منحصر ہے۔</p>
+
+<button id="make">🎬 ویڈیو بنائیں</button>
+<p id="status">تیار ہونے پر ویڈیو کا پری ویو اور ڈاؤن لوڈ لنک یہاں دکھائی دے گا۔</p>
+
+<div id="result" class="hidden">
+  <h3>آپ کی ویڈیو</h3>
+  <video id="preview" controls playsinline></video>
+  <a id="download" href="#" target="_blank" rel="noopener">ویڈیو ڈاؤن لوڈ / کھولیں</a>
+</div>
 </section>
 </main>
+
 <script>
 const workerURL = "https://bilawal-ai-video-api.ashrafm500.workers.dev/";
+const $ = id => document.getElementById(id);
 
-document.getElementById("make").addEventListener("click", async () => {
-  const prompt = document.getElementById("prompt").value.trim();
-  const status = document.getElementById("status");
-  const button = document.getElementById("make");
+$("mode").addEventListener("change", () => {
+  $("imageBox").classList.toggle("hidden", $("mode").value !== "image");
+});
+
+function wait(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function api(path, options = {}) {
+  const response = await fetch(workerURL + path, options);
+  const text = await response.text();
+  let data;
+  try { data = JSON.parse(text); }
+  catch { data = { message: text }; }
+
+  if (!response.ok) {
+    throw new Error(data.error || data.message || "API request failed");
+  }
+  return data;
+}
+
+$("make").addEventListener("click", async () => {
+  const button = $("make");
+  const status = $("status");
+  const resultBox = $("result");
+  resultBox.classList.add("hidden");
+
+  const prompt = $("prompt").value.trim();
+  const mode = $("mode").value;
+  const file = $("image").files[0];
+  const seconds = Number($("duration").value);
+  const resolution = $("resolution").value;
 
   if (!prompt) {
-    status.textContent = "براہ کرم پہلے کہانی لکھیں۔";
+    status.textContent = "براہ کرم ویڈیو کی کہانی لکھیں۔";
+    return;
+  }
+  if (mode === "image" && !file) {
+    status.textContent = "براہ کرم پہلے تصویر منتخب کریں۔";
+    return;
+  }
+  if (resolution === "1080p" && seconds > 15) {
+    status.textContent = "اس ورژن میں 1080p کے لیے 15 سیکنڈ یا اس سے کم دورانیہ منتخب کریں، یا 720p منتخب کریں۔";
     return;
   }
 
   button.disabled = true;
-  status.textContent = "درخواست بھیجی جا رہی ہے، انتظار کریں...";
 
   try {
-    const response = await fetch(workerURL, {
+    let filePath = "";
+
+    if (mode === "image") {
+      status.textContent = "تصویر اپلوڈ ہو رہی ہے...";
+      const form = new FormData();
+      form.append("image", file);
+      const uploaded = await api("upload-image", {
+        method: "POST",
+        body: form
+      });
+      filePath = uploaded.file_path;
+      if (!filePath) throw new Error("تصویر کا فائل پاتھ موصول نہیں ہوا۔");
+    }
+
+    status.textContent = "ویڈیو بنانے کی درخواست بھیجی جا رہی ہے...";
+    const payload = {
+      prompt,
+      voiceover: $("voiceover").value.trim(),
+      language: $("language").value,
+      seconds,
+      aspect_ratio: $("ratio").value,
+      resolution
+    };
+    if (mode === "image") payload.file_path = filePath;
+
+    const created = await api(mode === "image" ? "image-to-video" : "create", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({prompt: prompt})
+      body: JSON.stringify(payload)
     });
 
-    const result = await response.json();
-
-    if (!response.ok) {
-      throw new Error(result.error || result.message || JSON.stringify(result));
+    if (!created.id) {
+      throw new Error("پروجیکٹ ID موصول نہیں ہوئی: " + JSON.stringify(created));
     }
 
     status.textContent =
-      "درخواست موصول ہو گئی!\n\n" +
-      "Magic Hour کا جواب:\n" +
-      JSON.stringify(result, null, 2) +
-      "\n\nیہ ابتدائی مرحلہ ہے؛ ویڈیو کا نتیجہ حاصل کرنے کا مرحلہ ابھی باقی ہے۔";
+      "درخواست موصول ہو گئی۔\nProject ID: " + created.id +
+      "\nاب ویڈیو تیار ہونے کا انتظار ہے۔ دوبارہ Generate نہ دبائیں، اس سے اضافی کریڈٹس خرچ ہو سکتے ہیں۔";
 
-  } catch (error) {
+    for (let attempt = 0; attempt < 90; attempt++) {
+      await wait(5000);
+      const project = await api("status/" + encodeURIComponent(created.id));
+      const state = String(project.status || "processing").toLowerCase();
+
+      status.textContent =
+        "ویڈیو تیار ہو رہی ہے...\nحالت: " + state +
+        "\nبراہ کرم انتظار کریں۔";
+
+      if (state === "complete") {
+        const output = project.downloads && project.downloads[0];
+        if (!output || !output.url) {
+          throw new Error("ویڈیو مکمل ہوئی، لیکن ڈاؤن لوڈ لنک نہیں ملا۔");
+        }
+
+        $("preview").src = output.url;
+        $("download").href = output.url;
+        resultBox.classList.remove("hidden");
+        status.textContent = "ویڈیو تیار ہے! نیچے پری ویو دیکھیں یا ڈاؤن لوڈ لنک کھولیں۔";
+        return;
+      }
+
+      if (state === "error" || state === "canceled") {
+        throw new Error("ویڈیو نہیں بن سکی: " + JSON.stringify(project.error || state));
+      }
+    }
+
     status.textContent =
-      "درخواست مکمل نہیں ہوئی:\n" + error.message +
-      "\n\nاپنی API Key یہاں نہ لکھیں۔";
+      "ویڈیو ابھی تیار نہیں ہوئی۔ اسی Project ID کو بعد میں دوبارہ چیک کریں: " + created.id;
+  } catch (error) {
+    status.textContent = "خرابی:\n" + error.message;
   } finally {
     button.disabled = false;
   }
