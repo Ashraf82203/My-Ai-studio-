@@ -4,278 +4,73 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Free AI Video Generator</title>
+<title>My AI Video Generator</title>
 <style>
-body {
-  margin: 0;
-  padding: 18px;
-  background: #101827;
-  color: white;
-  font-family: Arial, sans-serif;
-}
-main {
-  max-width: 650px;
-  margin: auto;
-}
-h1 { text-align: center; color: #61f2bd; }
-.panel {
-  background: #1d2a40;
-  padding: 16px;
-  border-radius: 14px;
-  margin: 15px 0;
-}
-textarea, select, input {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 12px;
-  margin: 7px 0 14px;
-  border-radius: 8px;
-  border: 1px solid #60718b;
-  background: #101827;
-  color: white;
-  font-size: 16px;
-}
-button, .download {
-  display: inline-block;
-  box-sizing: border-box;
-  padding: 12px;
-  margin: 5px 0;
-  border: none;
-  border-radius: 8px;
-  background: #61f2bd;
-  color: #10251d;
-  font-size: 16px;
-  font-weight: bold;
-  text-decoration: none;
-  cursor: pointer;
-}
-button { width: 100%; }
-#preview {
-  display: block;
-  width: 100%;
-  max-height: 65vh;
-  background: black;
-  border-radius: 10px;
-  margin: 12px 0;
-}
-#status { color: #61f2bd; }
-.note { color: #c4d0e2; font-size: 14px; line-height: 1.6; }
+body{font-family:Arial,sans-serif;background:#101827;color:white;padding:18px;margin:0}
+main{max-width:650px;margin:auto}
+h1{color:#61f2bd;text-align:center}
+.panel{background:#1d2a40;padding:18px;border-radius:14px;margin:16px 0}
+textarea{width:100%;box-sizing:border-box;min-height:140px;padding:12px;font-size:16px;border-radius:8px}
+button{width:100%;padding:14px;margin-top:12px;background:#61f2bd;border:0;border-radius:8px;font-size:17px;font-weight:bold}
+button:disabled{opacity:.6}
+#status{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6}
+.note{color:#c4d0e2;line-height:1.6}
 </style>
 </head>
 <body>
 <main>
-<h1>🎬 Free AI Video Generator</h1>
-<p>تصویر منتخب کریں، کہانی لکھیں اور اپنی ویڈیو بنائیں۔</p>
-
+<h1>🎬 AI Video Generator</h1>
 <section class="panel">
-<h3>1۔ کہانی لکھیں</h3>
-<textarea id="story" rows="5">ایک خوبصورت باغ میں ایک چھوٹی چڑیا اڑ رہی تھی۔ وہ سب کو خوش رہنے کا پیغام دیتی ہے۔</textarea>
-
-<label>تصویر منتخب کریں:</label>
-<input type="file" id="picture" accept="image/*">
-
-<label>ویڈیو کا دورانیہ:</label>
-<select id="duration">
-  <option value="15">15 سیکنڈ</option>
-  <option value="30" selected>30 سیکنڈ</option>
-  <option value="60">1 منٹ</option>
-  <option value="180">3 منٹ</option>
-  <option value="300">5 منٹ</option>
-</select>
-
-<label>زبان منتخب کریں:</label>
-<select id="language">
-  <option value="ur-PK">اردو</option>
-  <option value="en-US">English</option>
-  <option value="hi-IN">हिन्दी</option>
-  <option value="ar-SA">العربية</option>
-  <option value="es-ES">Español</option>
-  <option value="fr-FR">Français</option>
-  <option value="de-DE">Deutsch</option>
-  <option value="tr-TR">Türkçe</option>
-  <option value="zh-CN">中文</option>
-  <option value="ja-JP">日本語</option>
-  <option value="ru-RU">Русский</option>
-</select>
-
-<button id="make">🎬 ویڈیو بنائیں</button>
-<button id="speak">🔊 کہانی کی آواز سنیں</button>
-<button id="stop">آواز بند کریں</button>
-<p class="note">زبان کی آواز آپ کے براؤزر میں دستیاب آوازوں پر منحصر ہے۔</p>
-</section>
-
-<section class="panel">
-<h3>2۔ ویڈیو پہلے یہاں دیکھیں</h3>
-<video id="preview" controls playsinline></video>
+<h3>اپنی ویڈیو کی کہانی لکھیں</h3>
+<textarea id="prompt">A small colorful bird flying through a beautiful garden at sunrise, cinematic camera movement, realistic animation.</textarea>
+<p class="note">یہ ٹیسٹ Magic Hour کو پرامپٹ بھیجے گا۔ ویڈیو بننے میں وقت لگ سکتا ہے۔</p>
+<button id="make">🎬 AI ویڈیو بنائیں</button>
 <p id="status">ویڈیو بنانے کے لیے بٹن دبائیں۔</p>
-<a id="download" class="download" hidden>⬇️ ویڈیو محفوظ کریں</a>
-<p class="note">
-یہ ورژن تصویر اور تحریر سے سادہ ویڈیو بناتا ہے۔
-آواز الگ سنائی دیتی ہے اور ابھی ڈاؤن لوڈ والی ویڈیو میں شامل نہیں ہوتی۔
-</p>
-</section>
-
-<section class="panel">
-<h3>3۔ حقیقی AI ویڈیو</h3>
-<p class="note">
-حرکت کرتی ہوئی حقیقی AI ویڈیو کے لیے الگ AI سروس درکار ہے۔
-یہ سہولت ابھی اس ویب سائٹ سے منسلک نہیں ہے۔
-</p>
 </section>
 </main>
-
 <script>
-const $ = id => document.getElementById(id);
-let image = null;
-let videoURL = null;
+const workerURL = "https://bilawal-ai-video-api.ashrafm500.workers.dev/";
 
-$("picture").addEventListener("change", () => {
-  const file = $("picture").files[0];
-  if (!file) return;
-  const img = new Image();
-  img.onload = () => {
-    image = img;
-    $("status").textContent = "تصویر تیار ہے۔ اب ویڈیو بنائیں۔";
-  };
-  img.onerror = () => {
-    $("status").textContent = "تصویر کھل نہیں سکی۔ دوسری تصویر آزمائیں۔";
-  };
-  img.src = URL.createObjectURL(file);
-});
+document.getElementById("make").addEventListener("click", async () => {
+  const prompt = document.getElementById("prompt").value.trim();
+  const status = document.getElementById("status");
+  const button = document.getElementById("make");
 
-$("speak").onclick = () => {
-  if (!("speechSynthesis" in window)) {
-    $("status").textContent = "آپ کے براؤزر میں آواز دستیاب نہیں۔";
-    return;
-  }
-  speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance($("story").value);
-  utterance.lang = $("language").value;
-  utterance.rate = 0.9;
-  speechSynthesis.speak(utterance);
-};
-
-$("stop").onclick = () => {
-  if ("speechSynthesis" in window) speechSynthesis.cancel();
-};
-
-$("make").onclick = async () => {
-  if (!image) {
-    $("status").textContent = "پہلے تصویر منتخب کریں۔";
-    return;
-  }
-  if (!("MediaRecorder" in window)) {
-    $("status").textContent = "Chrome براؤزر میں کوشش کریں۔";
+  if (!prompt) {
+    status.textContent = "براہ کرم پہلے کہانی لکھیں۔";
     return;
   }
 
-  const button = $("make");
   button.disabled = true;
-  $("download").hidden = true;
-  $("status").textContent = "ویڈیو بن رہی ہے، انتظار کریں...";
+  status.textContent = "درخواست بھیجی جا رہی ہے، انتظار کریں...";
 
   try {
-    const vertical = true;
-    const canvas = document.createElement("canvas");
-    canvas.width = vertical ? 720 : 1280;
-    canvas.height = vertical ? 1280 : 720;
-    const ctx = canvas.getContext("2d");
-    const seconds = Number($("duration").value);
-    const stream = canvas.captureStream(20);
-    const mime = MediaRecorder.isTypeSupported("video/webm;codecs=vp8")
-      ? "video/webm;codecs=vp8" : "video/webm";
-    const recorder = new MediaRecorder(stream, { mimeType: mime });
-    const chunks = [];
-    recorder.ondataavailable = e => {
-      if (e.data.size) chunks.push(e.data);
-    };
-
-    let start;
-    let finished = false;
-    const text = $("story").value.trim();
-
-    const stopped = new Promise(resolve => {
-      recorder.onstop = resolve;
+    const response = await fetch(workerURL, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({prompt: prompt})
     });
 
-    function draw(now) {
-      if (finished) return;
-      const elapsed = (now - start) / 1000;
-      const w = canvas.width, h = canvas.height;
-      const scale = Math.max(w / image.width, h / image.height);
-      const iw = image.width * scale;
-      const ih = image.height * scale;
+    const result = await response.json();
 
-      ctx.fillStyle = "#000";
-      ctx.fillRect(0, 0, w, h);
-      ctx.drawImage(image, (w-iw)/2, (h-ih)/2, iw, ih);
-
-      const gradient = ctx.createLinearGradient(0, h*0.45, 0, h);
-      gradient.addColorStop(0, "rgba(0,0,0,0)");
-      gradient.addColorStop(1, "rgba(0,0,0,0.9)");
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, w, h);
-
-      ctx.fillStyle = "white";
-      ctx.textAlign = "center";
-      ctx.font = "bold 38px sans-serif";
-
-      const words = text.split(/\s+/);
-      const lines = [];
-      let line = "";
-      for (const word of words) {
-        const test = line ? line + " " + word : word;
-        if (ctx.measureText(test).width > w*0.82 && line) {
-          lines.push(line);
-          line = word;
-        } else {
-          line = test;
-        }
-      }
-      if (line) lines.push(line);
-
-      const visible = lines.slice(0, 10);
-      let y = h - visible.length*55 - 75;
-      for (const part of visible) {
-        ctx.fillText(part, w/2, y, w*0.86);
-        y += 55;
-      }
-      ctx.font = "bold 22px sans-serif";
-      ctx.fillText("Free Video Generator", w/2, h-30);
-
-      if (elapsed >= seconds) {
-        finished = true;
-        recorder.stop();
-        stream.getTracks().forEach(t => t.stop());
-        return;
-      }
-      requestAnimationFrame(draw);
+    if (!response.ok) {
+      throw new Error(result.error || result.message || JSON.stringify(result));
     }
 
-    recorder.start();
-    start = performance.now();
-    requestAnimationFrame(draw);
-    await stopped;
+    status.textContent =
+      "درخواست موصول ہو گئی!\n\n" +
+      "Magic Hour کا جواب:\n" +
+      JSON.stringify(result, null, 2) +
+      "\n\nیہ ابتدائی مرحلہ ہے؛ ویڈیو کا نتیجہ حاصل کرنے کا مرحلہ ابھی باقی ہے۔";
 
-    const blob = new Blob(chunks, { type: "video/webm" });
-    if (!blob.size) throw new Error("Empty video");
-
-    if (videoURL) URL.revokeObjectURL(videoURL);
-    videoURL = URL.createObjectURL(blob);
-    $("preview").src = videoURL;
-    $("preview").load();
-    $("download").href = videoURL;
-    $("download").download = "my-video.webm";
-    $("download").hidden = false;
-    $("status").textContent =
-      "ویڈیو تیار ہے۔ پہلے یہاں چلائیں، پھر محفوظ کریں۔";
   } catch (error) {
-    $("status").textContent =
-      "ویڈیو نہیں بنی۔ صفحہ دوبارہ کھول کر Chrome میں کوشش کریں۔";
+    status.textContent =
+      "درخواست مکمل نہیں ہوئی:\n" + error.message +
+      "\n\nاپنی API Key یہاں نہ لکھیں۔";
   } finally {
     button.disabled = false;
   }
-};
+});
 </script>
 </body>
 </html>
