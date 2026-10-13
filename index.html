@@ -2,228 +2,534 @@
 <!DOCTYPE html>
 <html lang="ur">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>My AI Video Generator</title>
-<style>
-*{box-sizing:border-box}
-body{margin:0;padding:16px;background:#101827;color:#fff;font-family:Arial,sans-serif}
-main{max-width:700px;margin:auto}
-h1{text-align:center;color:#61f2bd}
-.panel{background:#1d2a40;padding:18px;border-radius:14px;margin:16px 0}
-label{display:block;margin:14px 0 7px;font-weight:bold}
-textarea,select,input[type=file]{width:100%;padding:12px;border-radius:8px;border:1px solid #52637c;background:#111c2e;color:white;font-size:16px}
-textarea{min-height:110px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-button{width:100%;padding:14px;margin-top:14px;border:0;border-radius:9px;background:#61f2bd;color:#102033;font-weight:bold;font-size:16px}
-button:disabled{opacity:.5}
-.note{color:#c4d0e2;line-height:1.6;font-size:14px}
-#status{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6}
-video{width:100%;margin-top:12px;border-radius:10px;background:#000}
-a{color:#61f2bd;overflow-wrap:anywhere}
-.hidden{display:none}
-@media(max-width:450px){.grid{grid-template-columns:1fr}}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My AI Studio - AI Video Generator</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #101322;
+      color: #f4f5ff;
+    }
+    header {
+      text-align: center;
+      padding: 25px 14px;
+      background: linear-gradient(135deg, #4532a8, #087eae);
+    }
+    header h1 { margin: 0 0 8px; font-size: 27px; }
+    header p { margin: 0; color: #e3e8ff; }
+    main { max-width: 760px; margin: auto; padding: 16px; }
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin: 12px 0 18px;
+    }
+    button, .tab {
+      border: 0;
+      border-radius: 10px;
+      padding: 13px 10px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .tab {
+      background: #252b43;
+      color: #e7eaff;
+    }
+    .tab.active { background: #6552e8; color: white; }
+    .panel {
+      background: #191f33;
+      border: 1px solid #303751;
+      border-radius: 15px;
+      padding: 18px;
+    }
+    h2 { font-size: 21px; margin-top: 0; }
+    label {
+      display: block;
+      margin: 14px 0 7px;
+      font-weight: bold;
+    }
+    input, textarea, select {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      border-radius: 9px;
+      border: 1px solid #444c68;
+      background: #101526;
+      color: white;
+      font: inherit;
+    }
+    textarea { min-height: 105px; resize: vertical; }
+    input[type="file"] { padding: 9px; }
+    .primary {
+      width: 100%;
+      margin-top: 18px;
+      background: #6a5af9;
+      color: white;
+    }
+    .secondary { background: #303953; color: white; }
+    button:disabled { opacity: .55; cursor: wait; }
+    .hint { font-size: 13px; color: #b9c3df; line-height: 1.6; }
+    .status {
+      margin-top: 16px;
+      padding: 12px;
+      border-radius: 9px;
+      background: #252b43;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+    .hidden { display: none !important; }
+    .result { margin-top: 18px; }
+    .result img, .result video {
+      width: 100%;
+      max-height: 480px;
+      object-fit: contain;
+      background: #080b13;
+      border-radius: 10px;
+    }
+    .download {
+      display: inline-block;
+      margin-top: 10px;
+      color: #a9d9ff;
+      overflow-wrap: anywhere;
+    }
+    footer {
+      text-align: center;
+      padding: 22px;
+      color: #aeb8d4;
+      font-size: 13px;
+    }
+  </style>
 </head>
 <body>
+<header>
+  <h1>✨ My AI Studio</h1>
+  <p>AI Video Generator • Image Studio • OCR</p>
+</header>
+
 <main>
-<h1>🎬 AI Video Generator</h1>
-
-<section class="panel">
-<label for="mode">ویڈیو بنانے کا طریقہ</label>
-<select id="mode">
-  <option value="text">ٹیکسٹ سے ویڈیو</option>
-  <option value="image">تصویر سے ویڈیو</option>
-</select>
-
-<div id="imageBox" class="hidden">
-  <label for="image">اپنی تصویر منتخب کریں (PNG/JPG/WebP، زیادہ سے زیادہ 10 MB)</label>
-  <input id="image" type="file" accept="image/png,image/jpeg,image/webp">
-</div>
-
-<label for="prompt">ویڈیو کی کہانی یا پرامپٹ</label>
-<textarea id="prompt" placeholder="یہاں اپنی ویڈیو کی تفصیل لکھیں">A colorful bird flying through a beautiful garden at sunrise, cinematic camera movement.</textarea>
-
-<label for="voiceover">وائس اوور کا متن (اختیاری)</label>
-<textarea id="voiceover" placeholder="وہ الفاظ لکھیں جو ویڈیو میں بولے جانے چاہییں"></textarea>
-<p class="note">نوٹ: متن کو آواز کی ہدایت کے طور پر بھیجا جائے گا۔ یہ نظام فی الحال اس بات کی ضمانت نہیں دیتا کہ ہر لفظ بعینہٖ بولا جائے گا۔</p>
-
-<div class="grid">
-  <div>
-    <label for="language">زبان</label>
-    <select id="language">
-      <option>Urdu</option>
-      <option>English</option>
-      <option>Arabic</option>
-      <option>Hindi</option>
-      <option>Punjabi</option>
-      <option>Other</option>
-    </select>
+  <div class="tabs">
+    <button class="tab active" data-panel="textVideo">ٹیکسٹ سے ویڈیو</button>
+    <button class="tab" data-panel="imageVideo">تصویر سے ویڈیو</button>
+    <button class="tab" data-panel="textImage">ٹیکسٹ سے تصویر</button>
+    <button class="tab" data-panel="ocr">تصویر سے تحریر</button>
   </div>
-  <div>
-    <label for="ratio">ویڈیو کا سائز</label>
-    <select id="ratio">
-      <option value="16:9">16:9 — YouTube</option>
-      <option value="9:16">9:16 — Shorts/Reels</option>
-    </select>
-  </div>
-  <div>
-    <label for="duration">دورانیہ</label>
-    <select id="duration">
-      <option value="15">15 سیکنڈ</option>
-      <option value="30">30 سیکنڈ</option>
-      <option value="60">1 منٹ</option>
-      <option value="180" disabled>3 منٹ — بعد میں دستیاب</option>
-      <option value="300" disabled>5 منٹ — بعد میں دستیاب</option>
-    </select>
-  </div>
-  <div>
-    <label for="resolution">ریزولوشن</label>
-    <select id="resolution">
-      <option value="720p">720p HD</option>
-      <option value="1080p">1080p Full HD</option>
-    </select>
-  </div>
-</div>
 
-<p class="note">1080p اس ورژن میں 15 سیکنڈ تک کی ویڈیو کے لیے منتخب کیا جا سکتا ہے۔ دستیابی آپ کے Magic Hour پلان اور منتخب ماڈل پر منحصر ہے۔</p>
+  <section id="textVideo" class="panel">
+    <h2>🎬 ٹیکسٹ سے ویڈیو</h2>
+    <form id="textVideoForm">
+      <label for="tvPrompt">ویڈیو کی تفصیل لکھیں</label>
+      <textarea id="tvPrompt" required placeholder="مثال: ایک خوبصورت باغ میں پرندے اڑ رہے ہیں، سنیما جیسا منظر"></textarea>
 
-<button id="make">🎬 ویڈیو بنائیں</button>
-<p id="status">تیار ہونے پر ویڈیو کا پری ویو اور ڈاؤن لوڈ لنک یہاں دکھائی دے گا۔</p>
+      <label for="tvSeconds">ویڈیو کا دورانیہ</label>
+      <select id="tvSeconds">
+        <option value="5">5 سیکنڈ</option>
+        <option value="10">10 سیکنڈ</option>
+      </select>
 
-<div id="result" class="hidden">
-  <h3>آپ کی ویڈیو</h3>
-  <video id="preview" controls playsinline></video>
-  <a id="download" href="#" target="_blank" rel="noopener">ویڈیو ڈاؤن لوڈ / کھولیں</a>
-</div>
-</section>
+      <label for="tvRatio">ویڈیو کا سائز</label>
+      <select id="tvRatio">
+        <option value="16:9">16:9 — YouTube</option>
+        <option value="9:16">9:16 — Shorts / Reels</option>
+      </select>
+
+      <label for="tvLanguage">آواز یا مکالمے کی زبان</label>
+      <select id="tvLanguage">
+        <option>Urdu</option>
+        <option>English</option>
+        <option>Arabic</option>
+        <option>Hindi</option>
+        <option>Punjabi</option>
+      </select>
+
+      <label for="tvVoice">وائس اوور کا متن (اختیاری)</label>
+      <textarea id="tvVoice" placeholder="یہاں اپنی آواز کے لیے الفاظ لکھیں"></textarea>
+
+      <p class="hint">ریزولوشن: 480p۔ آواز اور ویڈیو کی اصل سہولت Magic Hour کے ماڈل اور پلان پر منحصر ہے۔</p>
+      <button class="primary" type="submit">ویڈیو بنائیں</button>
+    </form>
+    <div id="tvStatus" class="status hidden" role="status"></div>
+    <div id="tvResult" class="result"></div>
+  </section>
+
+  <section id="imageVideo" class="panel hidden">
+    <h2>🖼️ تصویر سے ویڈیو</h2>
+    <form id="imageVideoForm">
+      <label for="ivFile">تصویر منتخب کریں</label>
+      <input id="ivFile" type="file" accept="image/png,image/jpeg,image/webp" required>
+
+      <label for="ivPrompt">تصویر میں کیا حرکت ہونی چاہیے؟</label>
+      <textarea id="ivPrompt" required placeholder="مثال: کیمرہ آہستہ آگے بڑھے، درختوں کے پتے ہوا میں ہلیں"></textarea>
+
+      <label for="ivSeconds">ویڈیو کا دورانیہ</label>
+      <select id="ivSeconds">
+        <option value="5">5 سیکنڈ</option>
+        <option value="10">10 سیکنڈ</option>
+      </select>
+
+      <label for="ivLanguage">مکالمے کی زبان</label>
+      <select id="ivLanguage">
+        <option>Urdu</option>
+        <option>English</option>
+        <option>Arabic</option>
+        <option>Hindi</option>
+        <option>Punjabi</option>
+      </select>
+
+      <label for="ivVoice">وائس اوور (اختیاری)</label>
+      <textarea id="ivVoice" placeholder="اپنی آواز کا متن لکھیں"></textarea>
+
+      <p class="hint">صرف PNG، JPG یا WebP تصویر، زیادہ سے زیادہ 10 MB۔</p>
+      <button class="primary" type="submit">تصویر سے ویڈیو بنائیں</button>
+    </form>
+    <div id="ivStatus" class="status hidden" role="status"></div>
+    <div id="ivResult" class="result"></div>
+  </section>
+
+  <section id="textImage" class="panel hidden">
+    <h2>🎨 ٹیکسٹ سے تصویر</h2>
+    <form id="textImageForm">
+      <label for="tiPrompt">تصویر کی تفصیل</label>
+      <textarea id="tiPrompt" required placeholder="مثال: برف پوش پہاڑ، نیلا آسمان، حقیقت کے قریب فوٹوگرافی"></textarea>
+
+      <label for="tiRatio">تصویر کا تناسب</label>
+      <select id="tiRatio">
+        <option value="1:1">1:1 — مربع</option>
+        <option value="16:9">16:9 — چوڑی تصویر</option>
+        <option value="9:16">9:16 — پورٹریٹ</option>
+      </select>
+
+      <p class="hint">درخواست Magic Hour کے API کو بھیجی جائے گی۔ تصویر بننے پر ہی کریڈٹس استعمال ہو سکتے ہیں۔</p>
+      <button class="primary" type="submit">تصویر بنائیں</button>
+    </form>
+    <div id="tiStatus" class="status hidden" role="status"></div>
+    <div id="tiResult" class="result"></div>
+  </section>
+
+  <section id="ocr" class="panel hidden">
+    <h2>📄 تصویر سے تحریر نکالیں</h2>
+    <label for="ocrFile">تصویر منتخب کریں</label>
+    <input id="ocrFile" type="file" accept="image/*">
+
+    <label for="ocrLanguage">تحریر کی زبان</label>
+    <select id="ocrLanguage">
+      <option value="eng">English</option>
+      <option value="urd">اردو</option>
+      <option value="eng+urd">English + اردو</option>
+    </select>
+
+    <button id="ocrButton" class="primary" type="button">تحریر پڑھیں</button>
+    <div id="ocrStatus" class="status hidden" role="status"></div>
+
+    <label for="ocrText">نکالی گئی تحریر</label>
+    <textarea id="ocrText" placeholder="تصویر سے حاصل ہونے والی تحریر یہاں آئے گی"></textarea>
+    <button id="copyOcr" class="secondary" type="button">تحریر کاپی کریں</button>
+    <p class="hint">OCR کے لیے انٹرنیٹ درکار ہے۔ نتیجہ تصویر کے معیار اور زبان کے مطابق مختلف ہو سکتا ہے۔</p>
+  </section>
 </main>
 
-<script>
-const workerURL = "https://bilawal-ai-video-api.ashrafm500.workers.dev/";
-const $ = id => document.getElementById(id);
+<footer>My AI Studio — AI tools in one place</footer>
 
-$("mode").addEventListener("change", () => {
-  $("imageBox").classList.toggle("hidden", $("mode").value !== "image");
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script>
+const API = "https://bilawal-ai-video-api.ashrafm500.workers.dev";
+
+document.querySelectorAll(".tab").forEach(button => {
+  button.addEventListener("click", () => {
+    document.querySelectorAll(".tab").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll("main > section").forEach(s => s.classList.add("hidden"));
+    button.classList.add("active");
+    document.getElementById(button.dataset.panel).classList.remove("hidden");
+  });
 });
 
-function wait(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+function showStatus(id, message) {
+  const el = document.getElementById(id);
+  el.classList.remove("hidden");
+  el.textContent = message;
 }
 
-async function api(path, options = {}) {
-  const response = await fetch(workerURL + path, options);
+function setBusy(form, busy, label) {
+  const button = form.querySelector('button[type="submit"]');
+  button.disabled = busy;
+  if (!button.dataset.original) button.dataset.original = button.textContent;
+  button.textContent = busy ? label : button.dataset.original;
+}
+
+async function apiJSON(path, options = {}) {
+  const response = await fetch(API + path, options);
   const text = await response.text();
   let data;
   try { data = JSON.parse(text); }
-  catch { data = { message: text }; }
+  catch { data = { error: text || "API نے غیر متوقع جواب دیا" }; }
 
   if (!response.ok) {
-    throw new Error(data.error || data.message || "API request failed");
+    throw new Error(data.error || data.message || JSON.stringify(data));
   }
   return data;
 }
 
-$("make").addEventListener("click", async () => {
-  const button = $("make");
-  const status = $("status");
-  const resultBox = $("result");
-  resultBox.classList.add("hidden");
-
-  const prompt = $("prompt").value.trim();
-  const mode = $("mode").value;
-  const file = $("image").files[0];
-  const seconds = Number($("duration").value);
-  const resolution = $("resolution").value;
-
-  if (!prompt) {
-    status.textContent = "براہ کرم ویڈیو کی کہانی لکھیں۔";
-    return;
+function findId(obj) {
+  if (!obj || typeof obj !== "object") return "";
+  for (const key of ["project_id", "id", "projectId"]) {
+    if (typeof obj[key] === "string" && obj[key]) return obj[key];
   }
-  if (mode === "image" && !file) {
-    status.textContent = "براہ کرم پہلے تصویر منتخب کریں۔";
-    return;
+  if (obj.project && typeof obj.project === "object") {
+    const id = findId(obj.project);
+    if (id) return id;
   }
-  if (resolution === "1080p" && seconds > 15) {
-    status.textContent = "اس ورژن میں 1080p کے لیے 15 سیکنڈ یا اس سے کم دورانیہ منتخب کریں، یا 720p منتخب کریں۔";
-    return;
+  if (obj.data && typeof obj.data === "object") {
+    const id = findId(obj.data);
+    if (id) return id;
+  }
+  return "";
+}
+
+function findMediaUrl(obj) {
+  if (!obj || typeof obj !== "object") return "";
+  for (const key of ["url", "video_url", "image_url", "download_url"]) {
+    if (typeof obj[key] === "string" && /^https?:\/\//i.test(obj[key])) {
+      return obj[key];
+    }
+  }
+  for (const key of ["downloads", "assets", "outputs", "images", "videos", "result"]) {
+    const value = obj[key];
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        const found = findMediaUrl(item);
+        if (found) return found;
+      }
+    } else if (value && typeof value === "object") {
+      const found = findMediaUrl(value);
+      if (found) return found;
+    }
+  }
+  if (obj.data && typeof obj.data === "object") return findMediaUrl(obj.data);
+  return "";
+}
+
+async function pollProject(kind, id, statusId, resultId) {
+  const route = kind === "image" ? "/image-status/" : "/status/";
+  const deadline = Date.now() + 5 * 60 * 1000;
+
+  while (Date.now() < deadline) {
+    await new Promise(resolve => setTimeout(resolve, 5000));
+    showStatus(statusId, "کام جاری ہے، براہِ کرم انتظار کریں…");
+
+    const data = await apiJSON(route + encodeURIComponent(id));
+    const url = findMediaUrl(data);
+    const state = String(data.status || data.state || data.project_status || "").toLowerCase();
+
+    if (url) {
+      renderMedia(resultId, url, kind);
+      showStatus(statusId, "تیار ہو گیا!");
+      return;
+    }
+
+    if (["failed", "error", "cancelled", "canceled"].includes(state)) {
+      throw new Error(data.error || data.message || "جنریشن مکمل نہیں ہو سکی۔");
+    }
   }
 
-  button.disabled = true;
+  showStatus(statusId, "کام میں وقت لگ رہا ہے۔ دوبارہ اسٹیٹس چیک کریں؛ نئی جنریشن شروع نہ کریں۔");
+}
+
+function renderMedia(resultId, url, kind) {
+  const result = document.getElementById(resultId);
+  result.replaceChildren();
+
+  if (kind === "video") {
+    const video = document.createElement("video");
+    video.controls = true;
+    video.playsInline = true;
+    video.src = url;
+    result.appendChild(video);
+  } else {
+    const img = document.createElement("img");
+    img.src = url;
+    img.alt = "AI سے تیار کردہ تصویر";
+    result.appendChild(img);
+  }
+
+  const link = document.createElement("a");
+  link.href = url;
+  link.target = "_blank";
+  link.rel = "noopener";
+  link.className = "download";
+  link.textContent = "نتیجہ کھولیں یا محفوظ کریں";
+  result.appendChild(link);
+}
+
+async function submitVideo(form, mode) {
+  const isImage = mode === "image";
+  const statusId = isImage ? "ivStatus" : "tvStatus";
+  const resultId = isImage ? "ivResult" : "tvResult";
+
+  document.getElementById(resultId).replaceChildren();
+  showStatus(statusId, "درخواست تیار ہو رہی ہے…");
+  setBusy(form, true, "انتظار کریں…");
 
   try {
     let filePath = "";
 
-    if (mode === "image") {
-      status.textContent = "تصویر اپلوڈ ہو رہی ہے...";
-      const form = new FormData();
-      form.append("image", file);
-      const uploaded = await api("upload-image", {
+    if (isImage) {
+      const file = document.getElementById("ivFile").files[0];
+      if (!file) throw new Error("پہلے تصویر منتخب کریں۔");
+
+      showStatus(statusId, "تصویر اپلوڈ ہو رہی ہے…");
+      const formData = new FormData();
+      formData.append("image", file);
+      const upload = await apiJSON("/upload-image", {
         method: "POST",
-        body: form
+        body: formData
       });
-      filePath = uploaded.file_path;
-      if (!filePath) throw new Error("تصویر کا فائل پاتھ موصول نہیں ہوا۔");
+      filePath = upload.file_path;
+      if (!filePath) throw new Error("اپلوڈ سے فائل کا راستہ نہیں ملا۔");
     }
 
-    status.textContent = "ویڈیو بنانے کی درخواست بھیجی جا رہی ہے...";
     const payload = {
-      prompt,
-      voiceover: $("voiceover").value.trim(),
-      language: $("language").value,
-      seconds,
-      aspect_ratio: $("ratio").value,
-      resolution
+      prompt: document.getElementById(isImage ? "ivPrompt" : "tvPrompt").value.trim(),
+      seconds: Number(document.getElementById(isImage ? "ivSeconds" : "tvSeconds").value),
+      language: document.getElementById(isImage ? "ivLanguage" : "tvLanguage").value,
+      voiceover: document.getElementById(isImage ? "ivVoice" : "tvVoice").value.trim()
     };
-    if (mode === "image") payload.file_path = filePath;
 
-    const created = await api(mode === "image" ? "image-to-video" : "create", {
+    if (!isImage) {
+      payload.aspect_ratio = document.getElementById("tvRatio").value;
+    } else {
+      payload.file_path = filePath;
+    }
+
+    showStatus(statusId, "AI ویڈیو کی درخواست بھیجی جا رہی ہے…");
+    const data = await apiJSON(isImage ? "/image-to-video" : "/create", {
       method: "POST",
-      headers: {"Content-Type": "application/json"},
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
     });
 
-    if (!created.id) {
-      throw new Error("پروجیکٹ ID موصول نہیں ہوئی: " + JSON.stringify(created));
+    const url = findMediaUrl(data);
+    if (url) {
+      renderMedia(resultId, url, "video");
+      showStatus(statusId, "ویڈیو تیار ہے!");
+      return;
     }
 
-    status.textContent =
-      "درخواست موصول ہو گئی۔\nProject ID: " + created.id +
-      "\nاب ویڈیو تیار ہونے کا انتظار ہے۔ دوبارہ Generate نہ دبائیں، اس سے اضافی کریڈٹس خرچ ہو سکتے ہیں۔";
-
-    for (let attempt = 0; attempt < 90; attempt++) {
-      await wait(5000);
-      const project = await api("status/" + encodeURIComponent(created.id));
-      const state = String(project.status || "processing").toLowerCase();
-
-      status.textContent =
-        "ویڈیو تیار ہو رہی ہے...\nحالت: " + state +
-        "\nبراہ کرم انتظار کریں۔";
-
-      if (state === "complete") {
-        const output = project.downloads && project.downloads[0];
-        if (!output || !output.url) {
-          throw new Error("ویڈیو مکمل ہوئی، لیکن ڈاؤن لوڈ لنک نہیں ملا۔");
-        }
-
-        $("preview").src = output.url;
-        $("download").href = output.url;
-        resultBox.classList.remove("hidden");
-        status.textContent = "ویڈیو تیار ہے! نیچے پری ویو دیکھیں یا ڈاؤن لوڈ لنک کھولیں۔";
-        return;
-      }
-
-      if (state === "error" || state === "canceled") {
-        throw new Error("ویڈیو نہیں بن سکی: " + JSON.stringify(project.error || state));
-      }
+    const id = findId(data);
+    if (!id) {
+      throw new Error("API نے پروجیکٹ ID نہیں دی۔ جواب: " + JSON.stringify(data));
     }
 
-    status.textContent =
-      "ویڈیو ابھی تیار نہیں ہوئی۔ اسی Project ID کو بعد میں دوبارہ چیک کریں: " + created.id;
+    showStatus(statusId, "ویڈیو بن رہی ہے۔ براہِ کرم انتظار کریں…");
+    await pollProject("video", id, statusId, resultId);
+
   } catch (error) {
-    status.textContent = "خرابی:\n" + error.message;
+    showStatus(statusId, "مسئلہ: " + error.message);
+  } finally {
+    setBusy(form, false);
+  }
+}
+
+document.getElementById("textVideoForm").addEventListener("submit", event => {
+  event.preventDefault();
+  submitVideo(event.currentTarget, "text");
+});
+
+document.getElementById("imageVideoForm").addEventListener("submit", event => {
+  event.preventDefault();
+  submitVideo(event.currentTarget, "image");
+});
+
+document.getElementById("textImageForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  const form = event.currentTarget;
+  showStatus("tiStatus", "تصویر کی درخواست بھیجی جا رہی ہے…");
+  document.getElementById("tiResult").replaceChildren();
+  setBusy(form, true, "انتظار کریں…");
+
+  try {
+    const data = await apiJSON("/text-to-image", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        prompt: document.getElementById("tiPrompt").value.trim(),
+        aspect_ratio: document.getElementById("tiRatio").value
+      })
+    });
+
+    const url = findMediaUrl(data);
+    if (url) {
+      renderMedia("tiResult", url, "image");
+      showStatus("tiStatus", "تصویر تیار ہے!");
+      return;
+    }
+
+    const id = findId(data);
+    if (!id) throw new Error("API نے پروجیکٹ ID نہیں دی: " + JSON.stringify(data));
+
+    showStatus("tiStatus", "تصویر بن رہی ہے…");
+    await pollProject("image", id, "tiStatus", "tiResult");
+  } catch (error) {
+    showStatus("tiStatus", "مسئلہ: " + error.message);
+  } finally {
+    setBusy(form, false);
+  }
+});
+
+document.getElementById("ocrButton").addEventListener("click", async () => {
+  const file = document.getElementById("ocrFile").files[0];
+  if (!file) {
+    showStatus("ocrStatus", "پہلے تصویر منتخب کریں۔");
+    return;
+  }
+  if (!window.Tesseract) {
+    showStatus("ocrStatus", "OCR لائبریری لوڈ نہیں ہوئی۔ انٹرنیٹ چیک کریں۔");
+    return;
+  }
+
+  const button = document.getElementById("ocrButton");
+  button.disabled = true;
+  document.getElementById("ocrText").value = "";
+  showStatus("ocrStatus", "تصویر پڑھی جا رہی ہے… پہلی بار زبان کی فائل ڈاؤن لوڈ ہو سکتی ہے۔");
+
+  try {
+    const language = document.getElementById("ocrLanguage").value;
+    const result = await Tesseract.recognize(file, language, {
+      logger: message => {
+        if (message.status) {
+          const percent = message.progress
+            ? " " + Math.round(message.progress * 100) + "%"
+            : "";
+          showStatus("ocrStatus", message.status + percent);
+        }
+      }
+    });
+
+    document.getElementById("ocrText").value = result.data.text || "";
+    showStatus("ocrStatus", result.data.text
+      ? "تحریر نکال لی گئی۔ براہِ کرم نتیجہ چیک کریں۔"
+      : "کوئی تحریر نہیں ملی۔ زیادہ صاف تصویر آزمائیں۔");
+  } catch (error) {
+    showStatus("ocrStatus", "OCR میں مسئلہ: " + error.message);
   } finally {
     button.disabled = false;
+  }
+});
+
+document.getElementById("copyOcr").addEventListener("click", async () => {
+  const text = document.getElementById("ocrText").value;
+  if (!text) {
+    showStatus("ocrStatus", "کاپی کرنے کے لیے پہلے تحریر نکالیں۔");
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(text);
+    showStatus("ocrStatus", "تحریر کاپی ہو گئی۔");
+  } catch {
+    document.getElementById("ocrText").select();
+    showStatus("ocrStatus", "تحریر منتخب کر دی ہے؛ اب Copy دبائیں۔");
   }
 });
 </script>
