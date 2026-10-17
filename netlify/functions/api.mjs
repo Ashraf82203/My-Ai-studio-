@@ -3,7 +3,9 @@ export default async (req) => {
   const json = (data, status = 200) =>
     new Response(JSON.stringify(data), {
       status,
-      headers: { "Content-Type": "application/json" }
+      headers: {
+        "Content-Type": "application/json; charset=utf-8"
+      }
     });
 
   try {
@@ -21,7 +23,9 @@ export default async (req) => {
     async function magic(path, method = "GET", body) {
       const options = {
         method,
-        headers: { Authorization: `Bearer ${key}` }
+        headers: {
+          Authorization: `Bearer ${key}`
+        }
       };
 
       if (body !== undefined) {
@@ -34,16 +38,36 @@ export default async (req) => {
         options
       );
 
-      const data = await response.json();
+      const text = await response.text();
+      let data = {};
+
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        data = { message: text || "نامعلوم API جواب" };
+      }
 
       if (!response.ok) {
-        return json({
-          error: data.message || data.error ||
-            `Magic Hour error: ${response.status}`
-        }, response.status);
+        const message =
+          data.message ||
+          data.error ||
+          `Magic Hour API error: ${response.status}`;
+
+        throw new Error(
+          typeof message === "string"
+            ? message
+            : JSON.stringify(message)
+        );
       }
 
       return data;
+    }
+
+    if (req.method === "GET" && route === "/") {
+      return json({
+        status: "ready",
+        message: "My AI Studio API is ready"
+      });
     }
 
     if (req.method === "POST" && route === "/upload-image") {
@@ -51,12 +75,12 @@ export default async (req) => {
       const file = form.get("image");
 
       if (!file || typeof file.arrayBuffer !== "function") {
-        return json({ error: "تصویر منتخب کریں۔" }, 400);
+        return json({ error: "براہ کرم تصویر منتخب کریں۔" }, 400);
       }
 
       if (file.size > 4 * 1024 * 1024) {
         return json({
-          error: "براہ کرم 4 MB سے چھوٹی تصویر استعمال کریں۔"
+          error: "4 MB سے چھوٹی تصویر استعمال کریں۔"
         }, 400);
       }
 
@@ -75,16 +99,18 @@ export default async (req) => {
         }, 400);
       }
 
-      const upload = await magic("/v1/files/upload-urls", "POST", {
-        items: [{ type: "image", extension: ext }]
-      });
-
-      if (upload instanceof Response) return upload;
+      const upload = await magic(
+        "/v1/files/upload-urls",
+        "POST",
+        { items: [{ type: "image", extension: ext }] }
+      );
 
       const item = upload.items?.[0];
 
       if (!item?.upload_url || !item?.file_path) {
-        return json({ error: "تصویر اپلوڈ کا لنک نہیں ملا۔" }, 502);
+        return json({
+          error: "تصویر اپلوڈ کا لنک نہیں ملا۔"
+        }, 502);
       }
 
       const put = await fetch(item.upload_url, {
@@ -93,7 +119,9 @@ export default async (req) => {
       });
 
       if (!put.ok) {
-        return json({ error: "تصویر اپلوڈ نہیں ہو سکی۔" }, 502);
+        return json({
+          error: "تصویر اپلوڈ نہیں ہو سکی۔"
+        }, 502);
       }
 
       return json({ file_path: item.file_path });
@@ -101,6 +129,10 @@ export default async (req) => {
 
     if (req.method === "POST" && route === "/create") {
       const p = await req.json();
+
+      if (!p.prompt?.trim()) {
+        return json({ error: "ویڈیو کا پرومپٹ لکھیں۔" }, 400);
+      }
 
       const prompt = [
         p.prompt,
@@ -110,7 +142,8 @@ export default async (req) => {
 
       const result = await magic("/v1/text-to-video", "POST", {
         name: "My AI Studio Video",
-        end_seconds: Number(p.seconds) || 5,
+        end_seconds: [5, 10].includes(Number(p.seconds))
+          ? Number(p.seconds) : 5,
         aspect_ratio: p.aspect_ratio || "16:9",
         model: "ltx-2.5",
         resolution: "480p",
@@ -118,7 +151,6 @@ export default async (req) => {
         style: { prompt }
       });
 
-      if (result instanceof Response) return result;
       return json(result);
     }
 
@@ -126,18 +158,21 @@ export default async (req) => {
       const p = await req.json();
 
       if (!p.file_path) {
-        return json({ error: "تصویر کا فائل راستہ موجود نہیں۔" }, 400);
+        return json({
+          error: "تصویر کا فائل راستہ موجود نہیں۔"
+        }, 400);
       }
 
       const prompt = [
-        p.prompt,
+        p.prompt || "",
         p.voiceover ? "Voiceover/dialogue: " + p.voiceover : "",
         p.language ? "Language: " + p.language : ""
       ].filter(Boolean).join("\n");
 
       const result = await magic("/v1/image-to-video", "POST", {
         name: "My AI Studio Image Video",
-        end_seconds: Number(p.seconds) || 5,
+        end_seconds: [5, 10].includes(Number(p.seconds))
+          ? Number(p.seconds) : 5,
         aspect_ratio: p.aspect_ratio || "9:16",
         model: "ltx-2.5",
         resolution: "480p",
@@ -146,12 +181,15 @@ export default async (req) => {
         assets: { image_file_path: p.file_path }
       });
 
-      if (result instanceof Response) return result;
       return json(result);
     }
 
     if (req.method === "POST" && route === "/text-to-image") {
       const p = await req.json();
+
+      if (!p.prompt?.trim()) {
+        return json({ error: "تصویر کا پرومپٹ لکھیں۔" }, 400);
+      }
 
       const result = await magic("/v1/ai-image-generator", "POST", {
         name: "My AI Studio Image",
@@ -165,7 +203,6 @@ export default async (req) => {
         }
       });
 
-      if (result instanceof Response) return result;
       return json(result);
     }
 
@@ -176,8 +213,6 @@ export default async (req) => {
       const result = await magic(
         "/v1/video-projects/" + encodeURIComponent(video[1])
       );
-
-      if (result instanceof Response) return result;
 
       if (result.downloads?.[0]?.url) {
         result.video_url = result.downloads[0].url;
@@ -191,8 +226,6 @@ export default async (req) => {
         "/v1/image-projects/" + encodeURIComponent(image[1])
       );
 
-      if (result instanceof Response) return result;
-
       if (result.downloads?.[0]?.url) {
         result.image_url = result.downloads[0].url;
       }
@@ -200,7 +233,11 @@ export default async (req) => {
       return json(result);
     }
 
-    return json({ error: "API route نہیں ملا۔" }, 404);
+    return json({
+      error: "API route نہیں ملا۔",
+      route,
+      method: req.method
+    }, 404);
 
   } catch (error) {
     return json({
@@ -208,4 +245,3 @@ export default async (req) => {
     }, 500);
   }
 };
-    
