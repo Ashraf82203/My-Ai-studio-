@@ -2,660 +2,345 @@
 <!DOCTYPE html>
 <html lang="ur">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Free AI Video Generator</title>
-  <meta name="description" content="Create AI videos and images from text, animate images, and extract text from pictures.">
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0b1020;
-      color: #f4f6ff;
-      line-height: 1.6;
-    }
-    header {
-      padding: 24px 15px;
-      text-align: center;
-      background: linear-gradient(135deg, #183d78, #54258a);
-    }
-    header h1 { margin: 0 0 8px; font-size: 27px; }
-    header p { margin: 0; color: #e1e7ff; }
-    main { max-width: 850px; margin: 20px auto; padding: 0 12px 35px; }
-    .notice {
-      padding: 12px;
-      border: 1px solid #40527b;
-      background: #131d35;
-      border-radius: 12px;
-      margin-bottom: 16px;
-      font-size: 14px;
-    }
-    .tabs {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-    button, .tab {
-      border: 0;
-      border-radius: 9px;
-      padding: 12px;
-      cursor: pointer;
-      font-size: 15px;
-      font-weight: bold;
-    }
-    .tab { background: #202b45; color: white; }
-    .tab.active { background: #7652ed; }
-    .panel {
-      display: none;
-      background: #131b30;
-      border: 1px solid #283754;
-      padding: 18px;
-      border-radius: 14px;
-    }
-    .panel.active { display: block; }
-    h2 { margin-top: 0; font-size: 21px; }
-    label {
-      display: block;
-      margin: 13px 0 5px;
-      font-weight: bold;
-    }
-    textarea, select, input[type="file"], input[type="text"] {
-      width: 100%;
-      padding: 11px;
-      border: 1px solid #405071;
-      border-radius: 9px;
-      background: #0b1224;
-      color: white;
-      font-size: 15px;
-    }
-    textarea { min-height: 100px; resize: vertical; }
-    .row {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-    }
-    .primary {
-      width: 100%;
-      margin-top: 17px;
-      background: #7652ed;
-      color: white;
-      padding: 13px;
-    }
-    button:disabled { opacity: .55; cursor: wait; }
-    .status {
-      margin-top: 13px;
-      padding: 10px;
-      border-radius: 8px;
-      background: #202b45;
-      overflow-wrap: anywhere;
-      white-space: pre-wrap;
-    }
-    .result { margin-top: 15px; }
-    .result video, .result img {
-      width: 100%;
-      max-height: 550px;
-      object-fit: contain;
-      background: #05070c;
-      border-radius: 10px;
-    }
-    .download {
-      display: inline-block;
-      margin-top: 10px;
-      padding: 10px 15px;
-      background: #197a58;
-      color: white;
-      border-radius: 8px;
-      text-decoration: none;
-    }
-    .small { font-size: 13px; color: #b9c5e0; }
-    footer { text-align: center; padding: 20px; color: #b9c5e0; }
-    @media (max-width: 480px) {
-      header h1 { font-size: 23px; }
-      .row { grid-template-columns: 1fr; }
-      .panel { padding: 13px; }
-      .tab { font-size: 13px; padding: 11px 5px; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My AI Studio — Free AI Generator</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#0b1020;color:#f4f6ff;line-height:1.6}
+header{text-align:center;padding:24px 12px;background:linear-gradient(135deg,#183d78,#54258a)}
+header h1{margin:0;font-size:27px}
+main{max-width:850px;margin:20px auto;padding:0 12px 35px}
+.notice,.status{padding:12px;background:#202b45;border-radius:9px;margin:12px 0;overflow-wrap:anywhere;white-space:pre-wrap}
+.tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:16px 0}
+button{border:0;border-radius:9px;padding:12px;cursor:pointer;font-size:15px;font-weight:bold}
+.tab{background:#202b45;color:white}
+.tab.active{background:#7652ed}
+.panel{display:none;background:#131b30;border:1px solid #283754;padding:16px;border-radius:14px}
+.panel.active{display:block}
+label{display:block;margin:13px 0 5px;font-weight:bold}
+textarea,select,input[type=file]{width:100%;padding:11px;border:1px solid #405071;border-radius:9px;background:#0b1224;color:white;font-size:15px}
+textarea{min-height:95px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.primary{width:100%;margin-top:15px;background:#7652ed;color:white}
+button:disabled{opacity:.6}
+.result{margin-top:15px}
+.result img,.result video{width:100%;max-height:550px;object-fit:contain;background:#05070c;border-radius:10px}
+.download{display:inline-block;margin-top:10px;padding:10px 15px;background:#197a58;color:white;border-radius:8px;text-decoration:none}
+.small{font-size:13px;color:#b9c5e0}
+footer{text-align:center;padding:20px;color:#b9c5e0}
+@media(max-width:480px){header h1{font-size:22px}.row{grid-template-columns:1fr}.panel{padding:12px}.tab{font-size:13px;padding:10px 5px}}
+</style>
 </head>
 <body>
-
 <header>
-  <h1>🎬 Free AI Video Generator</h1>
-  <p>Text سے ویڈیو، تصویر سے ویڈیو، AI تصویر اور OCR</p>
+<h1>🎬 My AI Studio</h1>
+<p>ویڈیو، تصویر اور OCR جنریٹر</p>
 </header>
 
 <main>
-  <div class="notice">
-    <strong>اہم:</strong> AI مواد بنانے کے لیے API سروس درکار ہے۔
-    اصل ویڈیو اور تصویر کی تیاری سروس کی دستیابی اور اکاؤنٹ کی حدود پر منحصر ہے۔
-  </div>
+<div class="notice">
+<strong>اہم:</strong> AI ویڈیو اور تصویر کے لیے فعال API سروس اور مناسب اکاؤنٹ کریڈٹس درکار ہو سکتے ہیں۔ Generate کرنے پر کریڈٹس خرچ ہو سکتے ہیں۔
+</div>
 
-  <div class="tabs">
-    <button class="tab active" data-panel="textVideo">🎬 Text to Video</button>
-    <button class="tab" data-panel="imageVideo">🖼️ Image to Video</button>
-    <button class="tab" data-panel="textImage">🎨 Text to Image</button>
-    <button class="tab" data-panel="ocr">📄 تصویر سے تحریر</button>
-  </div>
+<div class="tabs">
+<button type="button" class="tab active" data-panel="textVideo">🎬 Text to Video</button>
+<button type="button" class="tab" data-panel="imageVideo">🖼️ Image to Video</button>
+<button type="button" class="tab" data-panel="textImage">🎨 Text to Image</button>
+<button type="button" class="tab" data-panel="ocr">📄 تصویر سے تحریر</button>
+</div>
 
-  <!-- TEXT TO VIDEO -->
-  <section class="panel active" id="textVideo">
-    <h2>Text to Video</h2>
-    <form id="textVideoForm">
-      <label for="tvPrompt">ویڈیو کی تفصیل لکھیں</label>
-      <textarea id="tvPrompt" required
-        placeholder="مثال: ایک کاریگر فریج کی مرمت کر رہا ہے، حقیقت کے قریب منظر"></textarea>
+<section class="panel active" id="textVideo">
+<h2>Text to Video</h2>
+<form id="textVideoForm">
+<label for="tvPrompt">ویڈیو کی تفصیل</label>
+<textarea id="tvPrompt" required placeholder="مثال: ایک کاریگر فریج کی مرمت کر رہا ہے"></textarea>
+<div class="row">
+<div><label for="tvSeconds">دورانیہ</label>
+<select id="tvSeconds"><option value="5">5 سیکنڈ</option><option value="10">10 سیکنڈ</option></select></div>
+<div><label for="tvRatio">ویڈیو سائز</label>
+<select id="tvRatio"><option value="16:9">16:9 — YouTube</option><option value="9:16">9:16 — Shorts</option></select></div>
+</div>
+<label for="tvLanguage">زبان</label>
+<select id="tvLanguage"><option>Urdu</option><option>English</option><option>Hindi</option><option>Arabic</option></select>
+<label for="tvVoice">وائس اوور کی تفصیل (اختیاری)</label>
+<textarea id="tvVoice" placeholder="وائس اوور یا مکالمے"></textarea>
+<button class="primary" type="submit">ویڈیو بنائیں</button>
+</form>
+<div class="status" id="tvStatus" role="status">ویڈیو کی تفصیل لکھیں۔</div>
+<div class="result" id="tvResult"></div>
+</section>
 
-      <div class="row">
-        <div>
-          <label for="tvSeconds">ویڈیو کا دورانیہ</label>
-          <select id="tvSeconds">
-            <option value="5">5 سیکنڈ</option>
-            <option value="10">10 سیکنڈ</option>
-          </select>
-        </div>
-        <div>
-          <label for="tvRatio">ویڈیو کا سائز</label>
-          <select id="tvRatio">
-            <option value="16:9">16:9 — YouTube</option>
-            <option value="9:16">9:16 — Shorts/Reels</option>
-          </select>
-        </div>
-      </div>
+<section class="panel" id="imageVideo">
+<h2>Image to Video</h2>
+<form id="imageVideoForm">
+<label for="ivFile">تصویر منتخب کریں (4 MB تک)</label>
+<input id="ivFile" type="file" accept="image/jpeg,image/png,image/webp,image/avif" required>
+<label for="ivPrompt">تصویر میں کیا حرکت ہونی چاہیے؟</label>
+<textarea id="ivPrompt" required placeholder="مثال: کیمرہ آہستہ آگے بڑھے"></textarea>
+<div class="row">
+<div><label for="ivSeconds">دورانیہ</label>
+<select id="ivSeconds"><option value="5">5 سیکنڈ</option><option value="10">10 سیکنڈ</option></select></div>
+<div><label for="ivRatio">ویڈیو سائز</label>
+<select id="ivRatio"><option value="9:16">9:16 — Shorts</option><option value="16:9">16:9 — YouTube</option></select></div>
+</div>
+<label for="ivLanguage">زبان</label>
+<select id="ivLanguage"><option>Urdu</option><option>English</option><option>Hindi</option><option>Arabic</option></select>
+<label for="ivVoice">وائس اوور (اختیاری)</label>
+<textarea id="ivVoice"></textarea>
+<button class="primary" type="submit">تصویر سے ویڈیو بنائیں</button>
+</form>
+<div class="status" id="ivStatus" role="status">پہلے تصویر منتخب کریں۔</div>
+<div class="result" id="ivResult"></div>
+</section>
 
-      <label for="tvLanguage">زبان</label>
-      <select id="tvLanguage">
-        <option value="Urdu">اردو</option>
-        <option value="English">English</option>
-        <option value="Hindi">Hindi</option>
-        <option value="Arabic">Arabic</option>
-      </select>
+<section class="panel" id="textImage">
+<h2>Text to Image</h2>
+<form id="textImageForm">
+<label for="tiPrompt">کیسی تصویر بنانی ہے؟</label>
+<textarea id="tiPrompt" required placeholder="مثال: رنگ برنگے پھولوں والا خوبصورت باغ"></textarea>
+<label for="tiRatio">تصویر کا سائز</label>
+<select id="tiRatio"><option value="1:1">1:1 — مربع</option><option value="16:9">16:9 — چوڑی</option><option value="9:16">9:16 — لمبی</option></select>
+<button class="primary" type="submit">تصویر بنائیں</button>
+</form>
+<div class="status" id="tiStatus" role="status">تصویر کی تفصیل لکھیں۔</div>
+<div class="result" id="tiResult"></div>
+</section>
 
-      <label for="tvVoice">وائس اوور کی تفصیل (اختیاری)</label>
-      <textarea id="tvVoice" placeholder="وائس اوور یا مکالمے کی تفصیل لکھیں۔"></textarea>
-
-      <button class="primary" type="submit">ویڈیو بنائیں</button>
-    </form>
-    <div class="status" id="tvStatus" role="status">ویڈیو کی تفصیل لکھیں۔</div>
-    <div class="result" id="tvResult"></div>
-  </section>
-
-  <!-- IMAGE TO VIDEO -->
-  <section class="panel" id="imageVideo">
-    <h2>Image to Video</h2>
-    <form id="imageVideoForm">
-      <label for="ivFile">اپنی تصویر منتخب کریں</label>
-      <input id="ivFile" type="file" accept="image/*" required>
-
-      <label for="ivPrompt">تصویر میں کیا حرکت ہونی چاہیے؟</label>
-      <textarea id="ivPrompt" required
-        placeholder="مثال: کیمرہ آہستہ آگے بڑھے اور کاریگر فریج کی مرمت کرے۔"></textarea>
-
-      <div class="row">
-        <div>
-          <label for="ivSeconds">دورانیہ</label>
-          <select id="ivSeconds">
-            <option value="5">5 سیکنڈ</option>
-            <option value="10">10 سیکنڈ</option>
-          </select>
-        </div>
-        <div>
-          <label for="ivRatio">ویڈیو کا سائز</label>
-          <select id="ivRatio">
-            <option value="9:16">9:16 — Shorts/Reels</option>
-            <option value="16:9">16:9 — YouTube</option>
-          </select>
-        </div>
-      </div>
-
-      <label for="ivLanguage">زبان</label>
-      <select id="ivLanguage">
-        <option value="Urdu">اردو</option>
-        <option value="English">English</option>
-        <option value="Hindi">Hindi</option>
-        <option value="Arabic">Arabic</option>
-      </select>
-
-      <label for="ivVoice">وائس اوور کی تفصیل (اختیاری)</label>
-      <textarea id="ivVoice" placeholder="وائس اوور یا مکالمے کی تفصیل لکھیں۔"></textarea>
-
-      <button class="primary" type="submit">تصویر سے ویڈیو بنائیں</button>
-    </form>
-    <div class="status" id="ivStatus" role="status">پہلے تصویر منتخب کریں۔</div>
-    <div class="result" id="ivResult"></div>
-  </section>
-
-  <!-- TEXT TO IMAGE -->
-  <section class="panel" id="textImage">
-    <h2>Text to Image</h2>
-    <form id="textImageForm">
-      <label for="tiPrompt">کیسی تصویر بنانی ہے؟</label>
-      <textarea id="tiPrompt" required
-        placeholder="مثال: ایک جدید ورکشاپ میں فریج کی مرمت کرتا ہوا کاریگر"></textarea>
-
-      <label for="tiRatio">تصویر کا سائز</label>
-      <select id="tiRatio">
-        <option value="1:1">1:1 — مربع</option>
-        <option value="16:9">16:9 — چوڑی تصویر</option>
-        <option value="9:16">9:16 — لمبی تصویر</option>
-      </select>
-
-      <button class="primary" type="submit">تصویر بنائیں</button>
-    </form>
-    <div class="status" id="tiStatus" role="status">تصویر کی تفصیل لکھیں۔</div>
-    <div class="result" id="tiResult"></div>
-  </section>
-
-  <!-- OCR -->
-  <section class="panel" id="ocr">
-    <h2>تصویر سے تحریر نکالیں (OCR)</h2>
-    <p class="small">تصویر میں موجود اردو یا انگریزی تحریر پڑھنے کے لیے استعمال کریں۔ نتیجہ تصویر کے معیار پر منحصر ہے۔</p>
-
-    <label for="ocrFile">تصویر منتخب کریں</label>
-    <input id="ocrFile" type="file" accept="image/*">
-
-    <label for="ocrLanguage">تحریر کی زبان</label>
-    <select id="ocrLanguage">
-      <option value="eng">English</option>
-      <option value="urd">اردو</option>
-      <option value="eng+urd">اردو اور English</option>
-    </select>
-
-    <button class="primary" id="ocrButton" type="button">تصویر سے تحریر پڑھیں</button>
-
-    <label for="ocrText">حاصل شدہ تحریر</label>
-    <textarea id="ocrText" placeholder="نکالی گئی تحریر یہاں ظاہر ہوگی۔"></textarea>
-    <button class="primary" id="copyOcr" type="button">تحریر کاپی کریں</button>
-    <div class="status" id="ocrStatus" role="status">تصویر منتخب کریں۔</div>
-  </section>
+<section class="panel" id="ocr">
+<h2>تصویر سے تحریر نکالیں (OCR)</h2>
+<p class="small">تصویر سے اردو یا انگریزی تحریر پڑھیں۔</p>
+<label for="ocrFile">تصویر منتخب کریں</label>
+<input id="ocrFile" type="file" accept="image/*">
+<label for="ocrLanguage">تحریر کی زبان</label>
+<select id="ocrLanguage"><option value="eng">English</option><option value="urd">اردو</option><option value="eng+urd">اردو اور English</option></select>
+<button class="primary" id="ocrButton" type="button">تحریر پڑھیں</button>
+<label for="ocrText">حاصل شدہ تحریر</label>
+<textarea id="ocrText" placeholder="نتیجہ یہاں ظاہر ہوگا"></textarea>
+<button class="primary" id="copyOcr" type="button">تحریر کاپی کریں</button>
+<div class="status" id="ocrStatus" role="status">تصویر منتخب کریں۔</div>
+</section>
 </main>
 
-<footer>AI Video Generator — آپ کی تخلیقی ویب سائٹ</footer>
-
+<footer>My AI Studio — آپ کی تخلیقی ویب سائٹ</footer>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <script>
 "use strict";
 
-/*
-  یہ پتہ آپ کے موجودہ Cloudflare Worker کا ہے۔
-  API کی خفیہ کلید یہاں ہرگز نہ لکھیں۔
-*/
 const API = "/.netlify/functions/api";
 
-document.querySelectorAll(".tab").forEach(button => {
-  button.addEventListener("click", () => {
-    document.querySelectorAll(".tab").forEach(item =>
-      item.classList.toggle("active", item === button)
+document.querySelectorAll(".tab").forEach(button=>{
+  button.addEventListener("click",()=>{
+    document.querySelectorAll(".tab").forEach(tab=>
+      tab.classList.toggle("active",tab===button)
     );
-    document.querySelectorAll(".panel").forEach(panel =>
-      panel.classList.toggle("active", panel.id === button.dataset.panel)
+    document.querySelectorAll(".panel").forEach(panel=>
+      panel.classList.toggle("active",panel.id===button.dataset.panel)
     );
   });
 });
 
-function showStatus(id, message) {
-  document.getElementById(id).textContent = message;
+function status(id,message){
+  document.getElementById(id).textContent=message;
 }
 
-function setBusy(form, busy, text) {
-  const button = form.querySelector('button[type="submit"]');
-  if (!button.dataset.originalText) {
-    button.dataset.originalText = button.textContent;
-  }
-  button.disabled = busy;
-  button.textContent = busy ? text : button.dataset.originalText;
-}
-
-
-async function apiJSON(path, options = {}) {
-  const response = await fetch(
-    `${API}?route=${encodeURIComponent(path)}`,
-    options
-  );
-
-  const text = await response.text();
-  let data;
-
-  try {
-    data = text ? JSON.parse(text) : {};
-  } catch {
-    throw new Error("سرور کا جواب درست نہیں ہے۔");
+async function apiJSON(path,options={}){
+  let response;
+  try{
+    response=await fetch(`${API}?route=${encodeURIComponent(path)}`,options);
+  }catch(error){
+    throw new Error("Netlify API سے رابطہ نہیں ہو سکا۔ انٹرنیٹ چیک کریں۔");
   }
 
-  if (!response.ok || data.error) {
-    const error = data.error || data.message ||
-      `سرور کی خرابی: ${response.status}`;
+  const text=await response.text();
+  let data={};
+  try{data=text?JSON.parse(text):{};}
+  catch{throw new Error("سرور کا جواب درست JSON نہیں ہے۔");}
 
-    throw new Error(
-      typeof error === "string"
-        ? error
-        : error.message || "درخواست مکمل نہیں ہوئی۔"
-    );
+  if(!response.ok||data.error){
+    const err=data.error||data.message||`سرور کی خرابی: ${response.status}`;
+    throw new Error(typeof err==="string"?err:err.message||JSON.stringify(err));
   }
-
-  return data;
-  }
-  
-  const response = await fetch(API + path, options);
-  const text = await response.text();
-  let data;
-
-  try {
-    data = text ? JSON.parse(text) : {};
-  } catch {
-    throw new Error("سرور نے درست JSON جواب نہیں دیا۔");
-  }
-
-  if (!response.ok) {
-    throw new Error(
-      data.error || data.message || ("سرور کی خرابی: " + response.status)
-    );
-  }
-
-  if (data.error) {
-    throw new Error(data.error.message || data.error);
-  }
-
   return data;
 }
 
-function findMediaUrl(data) {
-  if (!data || typeof data !== "object") return "";
-
-  const keys = [
-    "video_url", "image_url", "output_url", "download_url",
-    "url", "media_url"
-  ];
-
-  for (const key of keys) {
-    if (typeof data[key] === "string" &&
-        /^https?:\/\//i.test(data[key])) {
-      return data[key];
-    }
+function findUrl(data,depth=0){
+  if(!data||depth>6)return "";
+  if(Array.isArray(data)){
+    for(const item of data){const u=findUrl(item,depth+1);if(u)return u;}
+    return "";
   }
-
-  for (const key of ["video", "image", "output", "result", "data", "project"]) {
-    const found = findMediaUrl(data[key]);
-    if (found) return found;
+  if(typeof data!=="object")return "";
+  for(const key of ["video_url","image_url","output_url","download_url","url","media_url"]){
+    if(typeof data[key]==="string"&&/^https?:\/\//i.test(data[key]))return data[key];
   }
-
-  if (Array.isArray(data)) {
-    for (const item of data) {
-      const found = findMediaUrl(item);
-      if (found) return found;
-    }
+  for(const key of ["downloads","video","image","output","result","data","project","images"]){
+    const u=findUrl(data[key],depth+1);if(u)return u;
   }
-
   return "";
 }
 
-function findId(data) {
-  if (!data || typeof data !== "object") return "";
-
-  for (const key of ["project_id", "id", "job_id", "task_id"]) {
-    if (typeof data[key] === "string" || typeof data[key] === "number") {
-      return String(data[key]);
-    }
+function findId(data,depth=0){
+  if(!data||typeof data!=="object"||depth>6)return "";
+  for(const key of ["project_id","id","job_id","task_id"]){
+    if(typeof data[key]==="string"||typeof data[key]==="number")return String(data[key]);
   }
-
-  for (const key of ["project", "data", "result", "job", "task"]) {
-    const found = findId(data[key]);
-    if (found) return found;
+  for(const key of ["project","data","result","job","task"]){
+    const id=findId(data[key],depth+1);if(id)return id;
   }
-
   return "";
 }
 
-function renderMedia(resultId, url, type) {
-  const container = document.getElementById(resultId);
-  container.replaceChildren();
-
-  const media = document.createElement(type === "video" ? "video" : "img");
-  media.src = url;
-  media.controls = type === "video";
-  media.playsInline = true;
-  media.alt = "AI generated result";
-  if (type === "video") media.preload = "metadata";
-  container.appendChild(media);
-
-  const link = document.createElement("a");
-  link.href = url;
-  link.target = "_blank";
-  link.rel = "noopener noreferrer";
-  link.className = "download";
-  link.textContent = "نتیجہ کھولیں / محفوظ کریں";
-  container.appendChild(link);
+function renderMedia(resultId,url,type){
+  const box=document.getElementById(resultId);
+  box.replaceChildren();
+  const media=document.createElement(type==="video"?"video":"img");
+  media.src=url;
+  media.controls=type==="video";
+  media.playsInline=true;
+  media.alt="AI result";
+  box.appendChild(media);
+  const link=document.createElement("a");
+  link.href=url;
+  link.target="_blank";
+  link.rel="noopener noreferrer";
+  link.className="download";
+  link.textContent="نتیجہ کھولیں / محفوظ کریں";
+  box.appendChild(link);
 }
 
-async function pollProject(kind, id, statusId, resultId) {
-  const endpoint = kind === "image" ? "/image-status/" : "/status/";
-  const maxAttempts = 60;
-
-  for (let attempt = 0; attempt < maxAttempts; attempt++) {
-    await new Promise(resolve => setTimeout(resolve, 5000));
-
-    const data = await apiJSON(endpoint + encodeURIComponent(id));
-    const url = findMediaUrl(data);
-
-    if (url) {
-      renderMedia(resultId, url, kind === "video" ? "video" : "image");
-      showStatus(statusId, "تیار ہوگیا! نتیجہ نیچے موجود ہے۔");
+async function poll(kind,id,statusId,resultId){
+  const path=kind==="image"?"/image-status/":"/status/";
+  for(let i=1;i<=60;i++){
+    await new Promise(resolve=>setTimeout(resolve,5000));
+    const data=await apiJSON(path+encodeURIComponent(id));
+    const url=findUrl(data);
+    if(url){
+      renderMedia(resultId,url,kind);
+      status(statusId,"تیار ہوگیا! نتیجہ نیچے موجود ہے۔");
       return;
     }
-
-    const state = String(
-      data.status || data.state || data.project?.status || ""
-    ).toLowerCase();
-
-    if (["failed", "error", "cancelled", "canceled"].includes(state)) {
-      throw new Error(data.message || "جنریشن مکمل نہیں ہوسکی۔");
+    const state=String(data.status||data.state||data.project?.status||"").toLowerCase();
+    if(["failed","error","cancelled","canceled"].includes(state)){
+      throw new Error(data.message||"جنریشن ناکام ہوگئی۔");
     }
-
-    showStatus(
-      statusId,
-      "کام جاری ہے… " + (attempt + 1) + "/" + maxAttempts +
-      " — براہِ کرم انتظار کریں۔"
-    );
+    status(statusId,`کام جاری ہے… ${i}/60۔ براہِ کرم انتظار کریں۔`);
   }
-
-  throw new Error(
-    "نتیجہ ابھی نہیں ملا۔ بعد میں دوبارہ اسٹیٹس چیک کریں۔"
-  );
+  throw new Error("ابھی نتیجہ نہیں ملا۔ بعد میں دوبارہ کوشش کریں۔");
 }
 
-async function submitVideo(form, mode) {
-  const isImage = mode === "image";
-  const statusId = isImage ? "ivStatus" : "tvStatus";
-  const resultId = isImage ? "ivResult" : "tvResult";
-
+async function createMedia(form,mode){
+  const video=mode==="video";
+  const imageToVideo=mode==="imageVideo";
+  const statusId=mode==="video"?"tvStatus":mode==="imageVideo"?"ivStatus":"tiStatus";
+  const resultId=mode==="video"?"tvResult":mode==="imageVideo"?"ivResult":"tiResult";
+  const button=form.querySelector('button[type="submit"]');
+  const original=button.textContent;
+  button.disabled=true;
+  button.textContent="انتظار کریں…";
   document.getElementById(resultId).replaceChildren();
-  setBusy(form, true, "انتظار کریں…");
-  showStatus(statusId, "درخواست تیار ہو رہی ہے…");
 
-  try {
-    let filePath = "";
-
-    if (isImage) {
-      const file = document.getElementById("ivFile").files[0];
-      if (!file) throw new Error("پہلے تصویر منتخب کریں۔");
-      if (!file.type.startsWith("image/")) {
-        throw new Error("براہِ کرم درست تصویر منتخب کریں۔");
-      }
-
-      showStatus(statusId, "تصویر اپلوڈ ہو رہی ہے…");
-      const formData = new FormData();
-      formData.append("image", file);
-
-      const upload = await apiJSON("/upload-image", {
-        method: "POST",
-        body: formData
-      });
-
-      filePath = upload.file_path || upload.path || upload.image_path || "";
-      if (!filePath) {
-        throw new Error("اپلوڈ کا راستہ نہیں ملا؛ Worker کا جواب چیک کرنا ہوگا۔");
-      }
+  try{
+    let filePath="";
+    if(imageToVideo){
+      const file=document.getElementById("ivFile").files[0];
+      if(!file)throw new Error("پہلے تصویر منتخب کریں۔");
+      if(file.size>4*1024*1024)throw new Error("4 MB سے چھوٹی تصویر استعمال کریں۔");
+      status(statusId,"تصویر اپلوڈ ہو رہی ہے…");
+      const fd=new FormData();
+      fd.append("image",file);
+      const uploaded=await apiJSON("/upload-image",{method:"POST",body:fd});
+      filePath=uploaded.file_path||uploaded.path||"";
+      if(!filePath)throw new Error("تصویر کا فائل راستہ نہیں ملا۔");
     }
 
-    const payload = {
-      prompt: document.getElementById(isImage ? "ivPrompt" : "tvPrompt").value.trim(),
-      seconds: Number(document.getElementById(isImage ? "ivSeconds" : "tvSeconds").value),
-      language: document.getElementById(isImage ? "ivLanguage" : "tvLanguage").value,
-      voiceover: document.getElementById(isImage ? "ivVoice" : "tvVoice").value.trim()
-    };
-
-    if (isImage) {
-      payload.file_path = filePath;
-      payload.aspect_ratio = document.getElementById("ivRatio").value;
-    } else {
-      payload.aspect_ratio = document.getElementById("tvRatio").value;
+    let payload,path;
+    if(video||imageToVideo){
+      const p=video?"tv":"iv";
+      payload={
+        prompt:document.getElementById(p+"Prompt").value.trim(),
+        seconds:Number(document.getElementById(p+"Seconds").value),
+        aspect_ratio:document.getElementById(p+"Ratio").value,
+        language:document.getElementById(p+"Language").value,
+        voiceover:document.getElementById(p+"Voice").value.trim()
+      };
+      if(imageToVideo)payload.file_path=filePath;
+      path=video?"/create":"/image-to-video";
+    }else{
+      payload={
+        prompt:document.getElementById("tiPrompt").value.trim(),
+        aspect_ratio:document.getElementById("tiRatio").value
+      };
+      path="/text-to-image";
     }
 
-    showStatus(statusId, "AI ویڈیو کی درخواست بھیجی جا رہی ہے…");
-    const data = await apiJSON(isImage ? "/image-to-video" : "/create", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+    if(!payload.prompt)throw new Error("براہِ کرم تفصیل لکھیں۔");
+    status(statusId,"درخواست API کو بھیجی جا رہی ہے…");
+    const data=await apiJSON(path,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify(payload)
     });
 
-    const url = findMediaUrl(data);
-    if (url) {
-      renderMedia(resultId, url, "video");
-      showStatus(statusId, "ویڈیو تیار ہے!");
+    const url=findUrl(data);
+    if(url){
+      renderMedia(resultId,url,video||imageToVideo?"video":"image");
+      status(statusId,"نتیجہ تیار ہے!");
       return;
     }
 
-    const id = findId(data);
-    if (!id) {
-      throw new Error("جواب میں پروجیکٹ ID نہیں ملی۔ Worker/API کا جواب چیک کریں۔");
-    }
-
-    showStatus(statusId, "ویڈیو بن رہی ہے۔");
-    await pollProject("video", id, statusId, resultId);
-
-  } catch (error) {
-    showStatus(statusId, "مسئلہ: " + error.message);
-  } finally {
-    setBusy(form, false);
+    const id=findId(data);
+    if(!id)throw new Error("API کے جواب میں پروجیکٹ ID یا نتیجے کا لنک نہیں ملا۔");
+    status(statusId,"تیاری شروع ہوگئی ہے…");
+    await poll(video||imageToVideo?"video":"image",id,statusId,resultId);
+  }catch(error){
+    status(statusId,"مسئلہ: "+error.message);
+  }finally{
+    button.disabled=false;
+    button.textContent=original;
   }
 }
 
-document.getElementById("textVideoForm").addEventListener("submit", event => {
-  event.preventDefault();
-  submitVideo(event.currentTarget, "text");
+document.getElementById("textVideoForm").addEventListener("submit",e=>{
+  e.preventDefault();createMedia(e.currentTarget,"video");
+});
+document.getElementById("imageVideoForm").addEventListener("submit",e=>{
+  e.preventDefault();createMedia(e.currentTarget,"imageVideo");
+});
+document.getElementById("textImageForm").addEventListener("submit",e=>{
+  e.preventDefault();createMedia(e.currentTarget,"image");
 });
 
-document.getElementById("imageVideoForm").addEventListener("submit", event => {
-  event.preventDefault();
-  submitVideo(event.currentTarget, "image");
-});
-
-document.getElementById("textImageForm").addEventListener("submit", async event => {
-  event.preventDefault();
-
-  const form = event.currentTarget;
-  const statusId = "tiStatus";
-  const resultId = "tiResult";
-
-  document.getElementById(resultId).replaceChildren();
-  setBusy(form, true, "انتظار کریں…");
-
-  try {
-    const payload = {
-      prompt: document.getElementById("tiPrompt").value.trim(),
-      aspect_ratio: document.getElementById("tiRatio").value
-    };
-
-    showStatus(statusId, "تصویر کی درخواست بھیجی جا رہی ہے…");
-
-    const data = await apiJSON("/text-to-image", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-
-    const url = findMediaUrl(data);
-
-    if (url) {
-      renderMedia(resultId, url, "image");
-      showStatus(statusId, "تصویر تیار ہے!");
-      return;
-    }
-
-    const id = findId(data);
-    if (!id) {
-      throw new Error("جواب میں پروجیکٹ ID یا تصویر کا لنک نہیں ملا۔");
-    }
-
-    showStatus(statusId, "تصویر بن رہی ہے…");
-    await pollProject("image", id, statusId, resultId);
-
-  } catch (error) {
-    showStatus(statusId, "مسئلہ: " + error.message);
-  } finally {
-    setBusy(form, false);
-  }
-});
-
-document.getElementById("ocrButton").addEventListener("click", async () => {
-  const file = document.getElementById("ocrFile").files[0];
-  const language = document.getElementById("ocrLanguage").value;
-  const output = document.getElementById("ocrText");
-  const button = document.getElementById("ocrButton");
-
-  if (!file) {
-    showStatus("ocrStatus", "پہلے تصویر منتخب کریں۔");
-    return;
-  }
-
-  if (!window.Tesseract) {
-    showStatus("ocrStatus", "OCR لائبریری لوڈ نہیں ہوئی۔ انٹرنیٹ چیک کریں۔");
-    return;
-  }
-
-  button.disabled = true;
-  output.value = "";
-  showStatus("ocrStatus", "تحریر پڑھی جا رہی ہے… پہلی بار کچھ وقت لگ سکتا ہے۔");
-
-  try {
-    const result = await Tesseract.recognize(file, language, {
-      logger: info => {
-        if (info.status) {
-          const percent = typeof info.progress === "number"
-            ? " " + Math.round(info.progress * 100) + "%"
-            : "";
-          showStatus("ocrStatus", info.status + percent);
-        }
+document.getElementById("ocrButton").addEventListener("click",async()=>{
+  const file=document.getElementById("ocrFile").files[0];
+  const button=document.getElementById("ocrButton");
+  const output=document.getElementById("ocrText");
+  if(!file){status("ocrStatus","پہلے تصویر منتخب کریں۔");return;}
+  if(!window.Tesseract){status("ocrStatus","OCR لائبریری لوڈ نہیں ہوئی۔ انٹرنیٹ چیک کریں۔");return;}
+  button.disabled=true;output.value="";
+  status("ocrStatus","تحریر پڑھی جا رہی ہے…");
+  try{
+    const result=await Tesseract.recognize(file,document.getElementById("ocrLanguage").value,{
+      logger:info=>{
+        if(info.status)status("ocrStatus",info.status+
+          (typeof info.progress==="number"?" "+Math.round(info.progress*100)+"%":""));
       }
     });
-
-    output.value = result.data.text || "";
-    showStatus(
-      "ocrStatus",
-      output.value.trim()
-        ? "مکمل ہوگیا۔ حاصل شدہ تحریر اوپر موجود ہے۔"
-        : "تحریر نہیں ملی۔ صاف تصویر استعمال کرکے دوبارہ کوشش کریں۔"
-    );
-  } catch (error) {
-    showStatus("ocrStatus", "OCR میں مسئلہ: " + error.message);
-  } finally {
-    button.disabled = false;
-  }
+    output.value=result.data.text||"";
+    status("ocrStatus",output.value.trim()?"مکمل ہوگیا۔":"تحریر نہیں ملی؛ صاف تصویر آزمائیں۔");
+  }catch(error){status("ocrStatus","OCR میں مسئلہ: "+error.message);}
+  finally{button.disabled=false;}
 });
 
-document.getElementById("copyOcr").addEventListener("click", async () => {
-  const output = document.getElementById("ocrText");
-
-  try {
+document.getElementById("copyOcr").addEventListener("click",async()=>{
+  const output=document.getElementById("ocrText");
+  try{
     await navigator.clipboard.writeText(output.value);
-    showStatus("ocrStatus", "تحریر کاپی ہوگئی۔");
-  } catch {
+    status("ocrStatus","تحریر کاپی ہوگئی۔");
+  }catch{
     output.select();
-    const success = document.execCommand("copy");
-    showStatus("ocrStatus", success
-      ? "تحریر کاپی ہوگئی۔"
-      : "تحریر منتخب ہوگئی ہے؛ اسے کاپی کریں۔");
+    const ok=document.execCommand("copy");
+    status("ocrStatus",ok?"تحریر کاپی ہوگئی۔":"تحریر منتخب کریں اور Copy دبائیں۔");
   }
 });
 </script>
