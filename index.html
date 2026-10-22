@@ -307,7 +307,36 @@ function setBusy(form, busy, text) {
   button.textContent = busy ? text : button.dataset.originalText;
 }
 
+
 async function apiJSON(path, options = {}) {
+  const response = await fetch(
+    `${API}?route=${encodeURIComponent(path)}`,
+    options
+  );
+
+  const text = await response.text();
+  let data;
+
+  try {
+    data = text ? JSON.parse(text) : {};
+  } catch {
+    throw new Error("سرور کا جواب درست نہیں ہے۔");
+  }
+
+  if (!response.ok || data.error) {
+    const error = data.error || data.message ||
+      `سرور کی خرابی: ${response.status}`;
+
+    throw new Error(
+      typeof error === "string"
+        ? error
+        : error.message || "درخواست مکمل نہیں ہوئی۔"
+    );
+  }
+
+  return data;
+  }
+  
   const response = await fetch(API + path, options);
   const text = await response.text();
   let data;
